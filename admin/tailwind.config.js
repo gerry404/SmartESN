@@ -42,13 +42,16 @@ export default {
         section: '160px',
       },
       fontFamily: {
-        label: ['Poppins', 'sans-serif'],
-        'body-lg': ['Poppins', 'sans-serif'],
-        display: ['Poppins', 'sans-serif'],
-        h2: ['Poppins', 'sans-serif'],
-        h1: ['Poppins', 'sans-serif'],
-        h3: ['Poppins', 'sans-serif'],
-        'body-md': ['Poppins', 'sans-serif'],
+        // Titres d'affichage — Roundex
+        display: ['var(--font-display)'],
+        h1: ['var(--font-display)'],
+        h2: ['var(--font-display)'],
+        // Corps, sous-titres, UI — HiJO
+        sans: ['var(--font-body)'],
+        h3: ['var(--font-body)'],
+        label: ['var(--font-body)'],
+        'body-lg': ['var(--font-body)'],
+        'body-md': ['var(--font-body)'],
       },
       fontSize: {
         label: ['12px', { lineHeight: '1', letterSpacing: '0.05em', fontWeight: '600' }],

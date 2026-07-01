@@ -1,3 +1,55 @@
+/* ------------------------------------------------------------------ */
+/* Système typographique SmartESN                                      */
+/*   Roundex  -> titres d'affichage (display / h1 / h2)                */
+/*   HiJO     -> corps, sous-titres, labels, UI                        */
+/* ------------------------------------------------------------------ */
+
+/* HiJO — 5 graisses (texte + UI) */
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOThin.otf') format('opentype');
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOLight.otf') format('opentype');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJORegular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOBold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOBlack.otf') format('opentype');
+  font-weight: 900;
+  font-display: swap;
+}
+
+/* Roundex — titres d'affichage */
+@font-face {
+  font-family: 'Roundex';
+  src: url('../fonts/Roundex.otf') format('opentype');
+  font-weight: normal;
+  font-display: swap;
+}
+
+/* Variables de police (utilisées par tailwind.config.js) */
+:root {
+  --font-display: 'Roundex', 'Poppins', sans-serif;
+  --font-body: 'HiJO', 'Poppins', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -24,7 +24,7 @@ const { content } = useHome()
     <main>
       <HeroSection :hero="content.hero" />
 
-      <BrandsSlider :brands="content.brands" />
+      <!-- <BrandsSlider :brands="content.brands" /> -->
 
       <FloatingCollage
         :title="content.collage.title"

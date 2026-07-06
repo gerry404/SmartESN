@@ -22,7 +22,7 @@ public class DataSeeder implements CommandLineRunner {
             Utilisateur admin = new Utilisateur();
             admin.setNom("Admin");
             admin.setEmail("admin@smartesn.com");
-            admin.setMotDePasse(passwordEncoder.encode("admin123")); // haché !
+            admin.setMotDePasse(passwordEncoder.encode("admin123"));
             admin.setRole(RoleUtilisateur.ADMIN);
             utilisateurRepository.save(admin);
             System.out.println(">>> Utilisateur admin cree : admin@smartesn.com / admin123");

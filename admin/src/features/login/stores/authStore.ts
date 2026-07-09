@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth',() => {
     try {
         const res = await authService.login(creds)
         setToken(res.token)
-        user.value = res.user
+        user.value = { email: res.email, role: res.role }
         return true
     }catch (e) {
       error.value = e instanceof Error ? e.message : 'Connexion impossible.'

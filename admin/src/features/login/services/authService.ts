@@ -15,9 +15,10 @@ const ENDPOINTS = {
 
 
 export function login(creds: Credentials): Promise<AuthResponse> {
+
   return http<AuthResponse>(ENDPOINTS.login, {
     method: 'POST',
-    body: JSON.stringify(creds),
+    body: JSON.stringify({ email: creds.email, motDePasse: creds.password }),
   })
 }
 

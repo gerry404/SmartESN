@@ -34,14 +34,13 @@ async function onSubmit() {
     <main class="min-h-screen flex items-center justify-center bg-page-bg px-margin py-16">
         <div class="w-full max-w-md">
             <RouterLink to="/" class="inline-block mb-10"><Logo /></RouterLink>
-        </div>
 
         <h1 class="font-display text-4xl font-bold tracking-tight text-text mb-2">Connexion</h1>
         <p class="font-body-md text-muted mb-8">Accedez a votre espace. </p>
 
         <div
         v-if="auth.error"
-        class="mb-6 rounded-2xl border border-brand-form/30 bg-brand-from/5 px-4 py-3 font-body-md text-[14px]  text-brand-from"
+        class="mb-6 rounded-2xl border border-brand-from/30 bg-brand-from/5 px-4 py-3 font-body-md text-[14px] text-brand-from"
         >
         {{ auth.error }}
       </div>
@@ -62,5 +61,6 @@ async function onSubmit() {
         Pas encore de compte ?
         <RouterLink to="/register" class="font-bold text-text hover:text-brand-from">Créer un compte</RouterLink>
       </p>
+        </div>
        </main>
 </template>

@@ -1,0 +1,77 @@
+⚙️ Infos globales
+
+- Base URL : http://localhost:8080
+- Auth : JWT. Après login, ajoute l'en-tête Authorization: Bearer <token> sur les routes protégées.
+- Content-Type : application/json sur tous les POST/PUT.
+
+---
+🔓 Endpoints PUBLICS (sans token)
+
+1. GET /health
+
+Vérifier que l'API tourne.
+- Réponse 200 : Service is running!
+
+2. POST /auth/login
+
+Se connecter et obtenir un token.
+- Body :
+{ "email": "admin@smartesn.com", "motDePasse": "admin123" }
+- Réponse 200 :
+{ "token": "eyJhbGc...", "email": "admin@smartesn.com", "role": "ADMIN" }
+- Erreur 401 : identifiants incorrects.
+
+3. POST /demandes — soumission par le client
+
+- Body (nom, email obligatoires ; email doit être valide ; telephone optionnel) :
+{ "description": "Une appli mobile de vente", "nom": "Awa", "email": "awa@test.com", "telephone": "690000000" }
+- Réponse 200 :
+{ "id": 2, "description": "...", "clientNom": "Awa", "clientEmail": "awa@test.com",
+  "statut": "NOUVELLE", "type": null, "complexite": null, "scoreConfiance": null,
+  "dateCreation": "2026-07-08T07:33:35" }
+- Erreur 400 : champ manquant/invalide.
+
+---
+🔒 Endpoints PROTÉGÉS (token requis)
+
+4. GET /demandes — lister toutes les demandes
+
+- Header : Authorization: Bearer <token>
+- Réponse 200 : tableau de DemandeResponse (même forme que ci-dessus).
+
+5. GET /demandes/{id} — détail d'une demande
+
+- Header : Authorization: Bearer <token>
+- Réponse 200 :
+{ "id": 2, "description": "...", "clientNom": "Awa", "clientEmail": "awa@test.com",
+  "statut": "QUALIFIEE", "type": "MOBILE", "complexite": "MOYENNE",
+  "dateCreation": "2026-07-08T07:33:35",
+  "budgetMin": 600000.0, "budgetMax": 1500000.0, "delaiSemaines": 10,
+  "equipeAffectee": "Équipe Technique" }
+- Erreur 404 : demande inexistante.
+
+6. PUT /demandes/{id}/qualifier — qualifier (→ estime + affecte auto)
+
+- Header : Authorization: Bearer <token>
+- Body :
+{ "type": "MOBILE", "complexite": "MOYENNE" }
+- Réponse 200 : un DemandeDetailResponse (budget/délai/équipe remplis, statut: QUALIFIEE).
+- Erreurs : 404 (id inconnu), 400 (type/complexité manquant).
+
+---
+📋 Valeurs autorisées (enums)
+
+┌────────────┬────────────────────────────────────────────────────────────────────┐
+│   Champ    │                              Valeurs                               │
+├────────────┼────────────────────────────────────────────────────────────────────┤
+│ type       │ MOBILE, WEB, DESKTOP, CONSEIL                                      │
+├────────────┼────────────────────────────────────────────────────────────────────┤
+│ complexite │ SIMPLE, MOYENNE, COMPLEXE                                          │
+├────────────┼────────────────────────────────────────────────────────────────────┤
+│ statut     │ NOUVELLE, EN_ANALYSE, QUALIFIEE, DEVIS_ENVOYE, EN_NEGOCIATION,     │
+│            │ GAGNEE, PERDUE                                                     │
+├────────────┼────────────────────────────────────────────────────────────────────┤
+│ role       │ COMMERCIAL, DIRECTEUR_TECHNIQUE, ADMIN                             │
+└────────────┴────────────────────────────────────────────────────────────────────┘
+
+Compte de test : admin@smartesn.com / admin123

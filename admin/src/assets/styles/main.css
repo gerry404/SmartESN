@@ -75,3 +75,52 @@
     width: 100%;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Scènes épinglées (PinnedScenes.vue)                                 */
+/* Styles globaux : les scènes sont fournies via <slot> par la section */
+/* parente, donc le CSS scoped de PinnedScenes ne les atteindrait pas. */
+/* ------------------------------------------------------------------ */
+.pinned-scene--flow {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .pinned-scene {
+    position: absolute;
+    inset: 0;
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform, filter;
+  }
+  .pinned-scene--active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    z-index: 10;
+  }
+  .pinned-scene--past {
+    opacity: 0;
+    transform: translateY(-4%) scale(0.94);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .pinned-scene--future {
+    opacity: 0;
+    transform: translateY(4%) scale(0.94);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinned-scene {
+    transition: opacity 0.25s linear;
+    transform: none !important;
+    filter: none !important;
+  }
+}

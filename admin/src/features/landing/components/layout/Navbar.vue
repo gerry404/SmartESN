@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseButton from '../ui/BaseButton.vue'
+import Logo from '../ui/Logo.vue'
 import type { NavLink } from '../../types'
 
 defineProps<{
@@ -17,15 +18,9 @@ defineProps<{
       class="pointer-events-auto w-full max-w-[990px] flex items-center justify-between bg-black  rounded-[60px] px-xs py-xs shadow-xl border border-white/10 h-[70px]"
     >
       <div class="flex items-center gap-md pl-xs">
-        <div
-          class="w-[34px] h-[34px] rounded-full border border-page-bg/80 overflow-hidden flex items-center justify-center shrink-0 bg-white"
-        >
-          <img
-            src="@/assets/images/logo_smart.png"
-            alt="SmartESN"
-            class="w-full h-full object-contain"
-          />
-        </div>
+        <a href="#" aria-label="SmartESN" class="shrink-0">
+          <Logo variant="light" mark="stack" />
+        </a>
         <nav class="hidden md:flex items-center gap-6">
           <a
             v-for="link in links"

@@ -5,21 +5,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        'page-bg': '#FAF9F5',
-        'panel-bg': '#F0EFEB',
-        'soft-card': '#E9E8E4',
-        'soft-card-2': '#F4F3EF',
-        text: '#1B1B1B',
-        muted: '#8C8880',
-        'muted-light': '#BDBAB2',
-        line: '#D9D7D0',
-        black: '#181818',
-        'deep-black': '#151515',
-        'white-card': '#FFFDF8',
-        'white-soft': '#FAF9F5',
+        // Palette "vert" extraite de l'image (ancienne valeur beige en commentaire).
+        'page-bg': '#F2F6EA', //   was #FAF9F5
+        'panel-bg': '#E9F0DC', //  was #F0EFEB
+        'soft-card': '#E0EACD', // was #E9E8E4
+        'soft-card-2': '#EEF3E2', // was #F4F3EF
+        text: '#16241A', //        was #1B1B1B
+        muted: '#74806A', //       was #8C8880
+        'muted-light': '#ABB79A', // was #BDBAB2
+        line: '#D2DEBE', //        was #D9D7D0
+        black: '#14201A', //       was #181818
+        'deep-black': '#0E1712', // was #151515
+        'white-card': '#FBFDF4', // was #FFFDF8
+        'white-soft': '#F2F6EA', // was #FAF9F5
         brand: {
-          from: '#FF416C',
-          to: '#FF4B2B',
+          from: '#3F8F2E', //      was #FF416C
+          to: '#A6D84B', //        was #FF4B2B
         },
       },
       borderRadius: {
@@ -42,11 +43,11 @@ export default {
         section: '160px',
       },
       fontFamily: {
-        // Titres d'affichage — Roundex
+        // Titres d'affichage  Roundex
         display: ['var(--font-display)'],
         h1: ['var(--font-display)'],
         h2: ['var(--font-display)'],
-        // Corps, sous-titres, UI — HiJO
+        // Corps, sous-titres, UI - HiJO
         sans: ['var(--font-body)'],
         h3: ['var(--font-body)'],
         label: ['var(--font-body)'],

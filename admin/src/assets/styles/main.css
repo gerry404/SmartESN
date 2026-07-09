@@ -1,0 +1,126 @@
+/* ------------------------------------------------------------------ */
+/* Système typographique SmartESN                                      */
+/*   Roundex  -> titres d'affichage (display / h1 / h2)                */
+/*   HiJO     -> corps, sous-titres, labels, UI                        */
+/* ------------------------------------------------------------------ */
+
+/* HiJO — 5 graisses (texte + UI) */
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOThin.otf') format('opentype');
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOLight.otf') format('opentype');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJORegular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOBold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HiJO';
+  src: url('../fonts/HiJOBlack.otf') format('opentype');
+  font-weight: 900;
+  font-display: swap;
+}
+
+/* Roundex — titres d'affichage */
+@font-face {
+  font-family: 'Roundex';
+  src: url('../fonts/Roundex.otf') format('opentype');
+  font-weight: normal;
+  font-display: swap;
+}
+
+/* Variables de police (utilisées par tailwind.config.js) */
+:root {
+  --font-display: 'Roundex', 'Poppins', sans-serif;
+  --font-body: 'HiJO', 'Poppins', sans-serif;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-page-bg text-text font-body-lg antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+  }
+
+  .marquee-container {
+    overflow: hidden;
+    width: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Scènes épinglées (PinnedScenes.vue)                                 */
+/* Styles globaux : les scènes sont fournies via <slot> par la section */
+/* parente, donc le CSS scoped de PinnedScenes ne les atteindrait pas. */
+/* ------------------------------------------------------------------ */
+.pinned-scene--flow {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .pinned-scene {
+    position: absolute;
+    inset: 0;
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform, filter;
+  }
+  .pinned-scene--active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    z-index: 10;
+  }
+  .pinned-scene--past {
+    opacity: 0;
+    transform: translateY(-4%) scale(0.94);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .pinned-scene--future {
+    opacity: 0;
+    transform: translateY(4%) scale(0.94);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinned-scene {
+    transition: opacity 0.25s linear;
+    transform: none !important;
+    filter: none !important;
+  }
+}

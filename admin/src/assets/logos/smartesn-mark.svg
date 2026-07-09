@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="SmartESN">
+  <defs>
+    <linearGradient id="smartesn-g" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3F8F2E"/>
+      <stop offset="1" stop-color="#A6D84B"/>
+    </linearGradient>
+  </defs>
+  <path d="M46 21C46 13.8 39 11 32 11C24 11 18 15 18 22C18 29 25 31.5 32 32C39 32.5 46 35 46 42C46 49 40 53 32 53C25 53 18 50.2 18 43"
+    stroke="url(#smartesn-g)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseIcon from '../ui/BaseIcon.vue'
+import Logo from '../ui/Logo.vue'
 import type { HomeContent } from '../../types'
 
 defineProps<{
@@ -16,9 +17,7 @@ const socials = ['share', 'public', 'hub']
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-xl mb-xl">
         <!-- Brand column -->
         <div class="flex flex-col gap-8">
-          <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center shrink-0">
-            <span class="text-white font-bold text-lg leading-none">{{ brand.charAt(0) }}</span>
-          </div>
+          <Logo variant="light" mark="stack" />
           <p class="font-body-md text-white/50 max-w-xs">{{ footer.tagline }}</p>
           <div class="flex gap-4">
             <a

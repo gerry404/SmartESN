@@ -1,20 +1,28 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import FeatureItem from './FeatureItem.vue'
 import type { FeatureItem as FeatureItemType } from '../../types'
 
-defineProps<{ items: FeatureItemType[] }>()
+const props = defineProps<{
+  items: FeatureItemType[]
+  activeIndex?: number
+}>()
+
+const active = computed(() => props.activeIndex ?? 0)
+const barHeight = computed(() => `${((active.value + 1) / props.items.length) * 100}%`)
 </script>
 
 <template>
   <div class="relative pl-8 border-l-[3px] border-line space-y-12">
     <div
-      class="absolute left-[-3px] top-0 w-[3px] h-1/3 bg-gradient-to-b from-brand-from to-brand-to"
+      class="absolute left-[-3px] top-0 w-[3px] bg-gradient-to-b from-brand-from to-brand-to transition-[height] duration-500 ease-out"
+      :style="{ height: barHeight }"
     ></div>
     <FeatureItem
       v-for="(item, i) in items"
       :key="item.title"
       :item="item"
-      :active="i === 0"
+      :active="i === active"
     />
   </div>
 </template>

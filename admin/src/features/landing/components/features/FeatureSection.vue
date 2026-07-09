@@ -1,50 +1,90 @@
 <script setup lang="ts">
-import FeatureList from './FeatureList.vue'
-import BaseIcon from '../ui/BaseIcon.vue'
-import BaseTitle from '../ui/BaseTitle.vue'
+import { computed } from 'vue'
+import PinnedScenes from '../scenes/PinnedScenes.vue'
+import FeatureVisual from './FeatureVisual.vue'
 import type { FeatureBlock } from '../../types'
 
-defineProps<{ block: FeatureBlock }>()
+const props = defineProps<{ block: FeatureBlock }>()
 
-// Mock "inbox" of incoming client requests shown in the visual panel.
-const inbox = [
-  { icon: 'description', color: 'text-brand-to', label: 'AO_Refonte_SI_Retail.pdf' },
-  { icon: 'mail', color: 'text-[#8A2387]', label: 'Demande  App mobile RH' },
-  { icon: 'request_quote', color: 'text-[#E94057]', label: 'Chiffrage Migration Cloud' },
-  { icon: 'insights', color: 'text-[#F27121]', label: 'Qualification  Data Platform' },
-]
+const keys = ['analyse', 'qualif', 'source']
+const scenes = computed(() =>
+  props.block.items.map((item, i) => ({ ...item, key: keys[i] ?? 'source' })),
+)
+const pad = (n: number) => String(n).padStart(2, '0')
 </script>
 
 <template>
-  <section id="produit" class="py-[120px] px-margin max-w-[1728px] mx-auto bg-page-bg">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-[100px] items-center">
-      <!-- Visual panel: incoming requests inbox -->
-      <div
-        class="bg-gradient-to-br from-soft-card-2 to-soft-card rounded-[40px] p-8 h-[700px] flex items-center justify-center relative overflow-hidden border border-line/30 shadow-sm"
-      >
-        <div class="w-full max-w-md bg-white-card rounded-2xl shadow-xl border border-line/20 p-6">
-          <div class="flex items-center justify-between mb-8">
-            <span class="font-label font-bold text-sm text-text">Demandes entrantes</span>
-            <BaseIcon name="more_horiz" class="text-muted" />
-          </div>
-          <div class="space-y-4">
+  <PinnedScenes id="produit" :count="scenes.length" :eyebrow="block.eyebrow">
+    <template #default="{ activeStep, enabled, sceneClass }">
+      <div v-for="(scene, i) in scenes" :key="scene.title" :class="sceneClass(i)">
+        <div class="lg:h-full flex items-center px-margin py-[80px] lg:py-0">
+          <div
+            class="max-w-[1728px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-[64px] xl:gap-[100px] items-center lg:h-[560px]"
+          >
+            <!-- Copy -->
+            <div class="flex flex-col justify-center max-w-xl">
+              <div
+                class="reveal flex items-center gap-3 mb-6"
+                :class="!enabled || activeStep === i ? 'is-in' : ''"
+                style="transition-delay: 80ms"
+              >
+                <span class="font-display text-5xl font-bold bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-transparent leading-none">{{ pad(i + 1) }}</span>
+                <span class="font-label text-[11px] font-bold uppercase tracking-wider text-muted">{{ block.eyebrow }}</span>
+              </div>
+              <h3
+                class="reveal font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text mb-6 leading-[1.05]"
+                :class="!enabled || activeStep === i ? 'is-in' : ''"
+                style="transition-delay: 160ms"
+              >
+                {{ scene.title }}
+              </h3>
+              <p
+                class="reveal font-body-lg text-muted leading-relaxed"
+                :class="!enabled || activeStep === i ? 'is-in' : ''"
+                style="transition-delay: 240ms"
+              >
+                {{ scene.description }}
+              </p>
+            </div>
+
+            <!-- Visual -->
             <div
-              v-for="row in inbox"
-              :key="row.label"
-              class="flex items-center gap-4 p-3 hover:bg-soft-card rounded-xl transition-colors"
+              class="reveal reveal--visual order-first lg:order-none flex items-center justify-center lg:h-full"
+              :class="!enabled || activeStep === i ? 'is-in' : ''"
+              style="transition-delay: 200ms"
             >
-              <BaseIcon :name="row.icon" :class="row.color" />
-              <span class="font-body-md font-medium text-text">{{ row.label }}</span>
+              <FeatureVisual :variant="scene.key" :active="!enabled || activeStep === i" />
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Copy -->
-      <div class="flex flex-col justify-center h-full max-w-lg">
-        <BaseTitle as="h3" class="mb-12">{{ block.title }}</BaseTitle>
-        <FeatureList :items="block.items" />
-      </div>
-    </div>
-  </section>
+    </template>
+  </PinnedScenes>
 </template>
+
+<style scoped>
+.reveal {
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 1024px) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  .reveal--visual {
+    transform: translateY(14px) scale(0.99);
+  }
+  .reveal.is-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+</style>

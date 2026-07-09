@@ -25,6 +25,11 @@ public class JwtService {
                 .compact();
     }
 
+    public String extraireRole(String token) {
+        return Jwts.parser().verifyWith(getKey()).build()
+                .parseSignedClaims(token).getPayload().get("role", String.class);
+    }
+
     public String extraireEmail(String token) {
         return Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload().getSubject();
     }

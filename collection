@@ -343,3 +343,16 @@ Ces routes renvoient `403` si l'utilisateur n'est pas `ADMIN`.
 - **CORS** : déjà autorisé côté backend pour `http://localhost:4200` (Angular) et
   `http://localhost:5173` (Vite/Vue). Si l'app admin tourne sur un autre port, me le dire pour
   l'ajouter.
+
+
+
+
+
+POST /auth/register — public
+// Requête
+{ "nomEntreprise": "AxeGroup SARL", "nomAdmin": "Gerry",
+  "email": "gerry@axegroup.com", "motDePasse": "secret123" }
+
+// Réponse 200 (auto-login)
+{ "token": "eyJ...", "email": "gerry@axegroup.com", "role": "ADMIN" }
+Erreurs : 409 (email déjà utilisé), 400 (validation : mot de passe < 6 car., email invalide, champs vides).

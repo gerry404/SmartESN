@@ -10,4 +10,8 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
     List<Demande> findByStatut(StatutDemande statut);
     List<Demande> findByType(TypeProjet type);
     long countByStatut(StatutDemande statut);
+
+    // cloisonnement par entreprise (multi-tenant)
+    List<Demande> findByEntrepriseId(Long entrepriseId);
+    List<Demande> findByEntrepriseIdAndStatut(Long entrepriseId, StatutDemande statut);
 }

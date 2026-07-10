@@ -14,6 +14,10 @@ public class Demande {
     @JoinColumn(name = "client_id")
     private Client client;
 
+    @ManyToOne
+    @JoinColumn(name = "entreprise_id")
+    private Entreprise entreprise;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -48,6 +52,9 @@ public class Demande {
 
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
+
+    public Entreprise getEntreprise() { return entreprise; }
+    public void setEntreprise(Entreprise entreprise) { this.entreprise = entreprise; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

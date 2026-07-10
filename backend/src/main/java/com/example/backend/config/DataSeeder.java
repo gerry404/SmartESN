@@ -14,13 +14,16 @@ public class DataSeeder implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final EquipeRepository equipeRepository;
     private final GrilleReferenceRepository grilleRepository;
+    private final EntrepriseRepository entrepriseRepository;
 
     public DataSeeder(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder,
-                      EquipeRepository equipeRepository, GrilleReferenceRepository grilleRepository) {
+                      EquipeRepository equipeRepository, GrilleReferenceRepository grilleRepository,
+                      EntrepriseRepository entrepriseRepository) {
         this.utilisateurRepository = utilisateurRepository;
         this.passwordEncoder = passwordEncoder;
         this.equipeRepository = equipeRepository;
         this.grilleRepository = grilleRepository;
+        this.entrepriseRepository = entrepriseRepository;
     }
 
     @Override
@@ -28,6 +31,17 @@ public class DataSeeder implements CommandLineRunner {
         seedAdmin();
         seedEquipes();
         seedGrille();
+        backfillFormTokens();
+    }
+
+    // Attribue un jeton de formulaire aux entreprises créées avant l'ajout de ce champ
+    private void backfillFormTokens() {
+        entrepriseRepository.findAll().stream()
+                .filter(e -> e.getFormToken() == null || e.getFormToken().isBlank())
+                .forEach(e -> {
+                    e.setFormToken(java.util.UUID.randomUUID().toString().replace("-", ""));
+                    entrepriseRepository.save(e);
+                });
     }
 
     private void seedAdmin() {

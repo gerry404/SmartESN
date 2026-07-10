@@ -148,7 +148,28 @@ La **validation** se fait par annotations sur le DTO (`@NotBlank`, `@Email`, `@N
   ses chiffres.
 - **`GlobalExceptionHandler`** (`@RestControllerAdvice`) — transforme les exceptions en
   réponses HTTP propres : erreurs de validation → **400** (avec le détail des champs),
-  règle métier violée → **409**. Évite les vilaines erreurs 500 brutes.
+  règle métier violée → **409**, service IA injoignable → **502**. Évite les erreurs 500 brutes.
+
+### 3.6 L'intégration du service IA (`IaClient`)
+
+Le backend Java ne contient **aucune logique d'IA** : il **délègue** au microservice IA
+(FastAPI), appelé en HTTP.
+
+- **`IaClient`** (`service/`) — encapsule l'appel réseau vers le service IA. Il expose une
+  méthode `classifier(description)` qui appelle `POST /classify` du service IA et renvoie le
+  type de projet, la complexité et un score de confiance.
+- L'adresse du service IA est configurable via `app.ia.base-url` (lue depuis le `.env`,
+  valeur par défaut `http://localhost:8000`).
+- Détail technique : le client est configuré en **HTTP/1.1 pur** (`SimpleClientHttpRequestFactory`),
+  car le serveur FastAPI n'accepte pas les tentatives d'« upgrade » HTTP/2 du client par défaut.
+
+**Deux façons de qualifier une demande :**
+- **manuelle** : un interne saisit lui-même le type et la complexité (`PUT /demandes/{id}/qualifier`) ;
+- **automatique** : l'IA les détermine à partir de la description (`POST /demandes/{id}/analyser`).
+
+Dans les deux cas, la suite est **identique et déterministe** (méthode commune côté controller) :
+estimation via la grille, puis affectation à l'équipe, puis passage au statut `QUALIFIEE`.
+Si le service IA est indisponible, l'appel renvoie une **502** propre.
 
 ---
 
@@ -192,7 +213,8 @@ Base URL : `http://localhost:8080` · JSON partout · jeton via `Authorization: 
 |--------|-----|-------|------|-------------|
 | GET | `/demandes` | — (`?statut=NOUVELLE` optionnel) | interne | Liste des demandes |
 | GET | `/demandes/{id}` | — | interne | Détail (avec budget/délai/équipe) |
-| PUT | `/demandes/{id}/qualifier` | `{type, complexite}` | interne | Qualifie → estime + affecte auto |
+| PUT | `/demandes/{id}/qualifier` | `{type, complexite}` | interne | Qualification **manuelle** → estime + affecte auto |
+| POST | `/demandes/{id}/analyser` | — | interne | Qualification **par l'IA** → estime + affecte auto |
 | PUT | `/demandes/{id}/statut` | `{statut, budgetSigne?, delaiReel?}` | interne | Change le statut (si GAGNEE → crée le projet) |
 | POST | `/demandes/{id}/reaffecter` | `{equipeId}` | interne | Réaffectation manuelle |
 | POST | `/demandes/{id}/devis` | — | interne | Génère le devis |
@@ -229,7 +251,11 @@ Base URL : `http://localhost:8080` · JSON partout · jeton via `Authorization: 
 cd $HOME\Desktop\SmartESN\backend
 .\gradlew.bat bootRun
 ```
-(PostgreSQL doit tourner, base `smartesn`, mot de passe dans `application.yaml`.)
+Prérequis :
+- **PostgreSQL** doit tourner (base `smartesn`).
+- Un fichier **`.env`** (copié depuis `.env.example`) renseigne `DB_PASSWORD`, `JWT_SECRET`
+  et `IA_BASE_URL`. Sans `.env`, les valeurs par défaut de développement s'appliquent.
+- Pour la **qualification par IA** (`/analyser`), le **service IA** doit tourner (port 8000).
 
 ### Exemple de test complet (PowerShell)
 ```powershell
@@ -244,9 +270,12 @@ $d = Invoke-RestMethod -Uri http://localhost:8080/demandes -Method Post `
      -ContentType "application/json" `
      -Body '{"description":"Site web vitrine","nom":"Bob","email":"bob@test.com"}'
 
-# 3. Qualifier → estimation + affectation automatiques
+# 3a. Qualifier MANUELLEMENT → estimation + affectation automatiques
 Invoke-RestMethod -Uri "http://localhost:8080/demandes/$($d.id)/qualifier" -Method Put `
      -Headers $h -ContentType "application/json" -Body '{"type":"WEB","complexite":"MOYENNE"}'
+
+# 3b. (Alternative) Qualifier PAR L'IA (nécessite le service IA + une clé LLM)
+# Invoke-RestMethod -Uri "http://localhost:8080/demandes/$($d.id)/analyser" -Method Post -Headers $h
 
 # 4. Générer puis envoyer le devis
 $dv = Invoke-RestMethod -Uri "http://localhost:8080/demandes/$($d.id)/devis" -Method Post -Headers $h
@@ -263,11 +292,14 @@ Invoke-RestMethod -Uri http://localhost:8080/statistiques -Method Get -Headers $
 
 ---
 
-## 7. Ce qui reste à faire (nécessite l'IA ou un service externe)
+## 7. Ce qui reste à faire
 
-- Remplissage **automatique** du type + complexité (service IA FastAPI) — remplacera le manuel.
-- **Contenu rédigé** du devis + proposition technique (LLM).
-- **Formulaire dynamique** (questions générées par IA).
+Déjà en place : la **qualification automatique** est branchée (`POST /demandes/{id}/analyser`
+appelle le service IA). Restent à intégrer :
+
+- **Contenu rédigé** du devis + proposition technique via le service IA (endpoint `/draft`
+  du service IA déjà prêt ; à appeler depuis le backend).
+- **Formulaire dynamique** (endpoint `/intake` du service IA à relier au frontend).
 - **Synthèse du reporting** en langage naturel (LLM) — les *chiffres* sont déjà là.
 - **Export Jira**, **envoi e-mail réel** (services externes).
 
@@ -275,8 +307,9 @@ Invoke-RestMethod -Uri http://localhost:8080/statistiques -Method Get -Headers $
 
 ## 8. Points d'attention (dette technique à traiter avant la prod)
 
-- Le **mot de passe PostgreSQL** et la **clé secrète JWT** sont en clair dans le code →
-  à externaliser en **variables d'environnement** avant tout `git push` (le dépôt est public).
+- Les secrets (**mot de passe PostgreSQL**, **clé JWT**, **base-url IA**) sont désormais lus
+  depuis un fichier **`.env`** (non versionné). `application.yaml` ne contient plus que des
+  valeurs par défaut de développement. ✔
 - `ddl-auto: update` ne supprime jamais les colonnes obsolètes (on a dû retirer à la main la
   colonne fantôme `valider`). Pour la prod, prévoir un outil de migration (Flyway/Liquibase).
 - La gestion d'erreurs peut être enrichie (404 « ressource introuvable » standardisés).

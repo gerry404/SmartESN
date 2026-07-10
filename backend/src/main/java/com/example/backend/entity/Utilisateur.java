@@ -13,6 +13,10 @@ public class Utilisateur {
     @JoinColumn(name = "equipe_id")
     private Equipe equipe;
 
+    @ManyToOne
+    @JoinColumn(name = "entreprise_id")
+    private Entreprise entreprise;
+
     private String nom;
 
     private String email;
@@ -21,6 +25,9 @@ public class Utilisateur {
 
     @Enumerated(EnumType.STRING)
     private RoleUtilisateur role;
+
+    public Entreprise getEntreprise() { return entreprise; }
+    public void setEntreprise(Entreprise entreprise) { this.entreprise = entreprise; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

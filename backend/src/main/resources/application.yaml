@@ -1,10 +1,13 @@
 spring:
+  # importe le fichier .env (format clé=valeur) s'il existe ; sinon on garde les valeurs par défaut
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/smartesn
-    username: postgres
-    password: genius
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/smartesn}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,3 +15,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+# Sécurité applicative (valeurs réelles dans le fichier .env, non versionné)
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-a-changer-absolument-en-production-123456}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  # Adresse du microservice IA (FastAPI)
+  ia:
+    base-url: ${IA_BASE_URL:http://localhost:8000}
+  # NB : la configuration Jira n'est PAS ici. En SaaS, chaque entreprise a son propre Jira ;
+  # la config est donc stockée par entreprise en base (voir entité Entreprise).
+  # URL publique du formulaire client (front) servant à construire le lien partageable
+  form-base-url: ${FORM_BASE_URL:http://localhost:4200/formulaire}

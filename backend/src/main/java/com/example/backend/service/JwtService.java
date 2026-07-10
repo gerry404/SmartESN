@@ -1,6 +1,7 @@
 package com.example.backend.service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -8,11 +9,18 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET = "smartens-cle-secrete-a-changer-123456789";
-    private static final long DUREE = 1000 * 60 * 60 * 24;
+    // Injectés depuis application.yaml -> qui lit le fichier .env (non versionné)
+    private final String secret;
+    private final long dureeMs;
+
+    public JwtService(@Value("${app.jwt.secret}") String secret,
+                      @Value("${app.jwt.expiration-ms}") long dureeMs) {
+        this.secret = secret;
+        this.dureeMs = dureeMs;
+    }
 
     private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String genererToken(String email, String role) {
@@ -20,7 +28,7 @@ public class JwtService {
                 .subject(email)
                 .claim("role",role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + DUREE))
+                .expiration(new Date(System.currentTimeMillis() + dureeMs))
                 .signWith(getKey())
                 .compact();
     }

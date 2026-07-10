@@ -5,6 +5,8 @@ import com.example.backend.dto.*;
 import com.example.backend.repository.*;
 import com.example.backend.service.AffectationService;
 import com.example.backend.service.EstimationService;
+import com.example.backend.service.IaClient;
+import com.example.backend.service.UtilisateurCourantService;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +25,14 @@ public class DemandeController {
     private final ProjetRepository projetRepository;
     private final EstimationService estimationService;
     private final AffectationService affectationService;
+    private final IaClient iaClient;
+    private final UtilisateurCourantService utilisateurCourant;
 
     public DemandeController(DemandeRepository demandeRepository, ClientRepository clientRepository,
                              EstimationRepository estimationRepository, AffectationRepository affectationRepository,
                              EquipeRepository equipeRepository, ProjetRepository projetRepository,
-                             EstimationService estimationService, AffectationService affectationService) {
+                             EstimationService estimationService, AffectationService affectationService,
+                             IaClient iaClient, UtilisateurCourantService utilisateurCourant) {
         this.demandeRepository = demandeRepository;
         this.clientRepository = clientRepository;
         this.estimationRepository = estimationRepository;
@@ -36,6 +41,8 @@ public class DemandeController {
         this.projetRepository = projetRepository;
         this.estimationService = estimationService;
         this.affectationService = affectationService;
+        this.iaClient = iaClient;
+        this.utilisateurCourant = utilisateurCourant;
     }
 
     // ---- Soumission par le client (public) ----
@@ -60,42 +67,70 @@ public class DemandeController {
     // ---- Liste, avec filtre optionnel par statut (interne) ----
     @GetMapping
     public List<DemandeResponse> lister(@RequestParam(required = false) StatutDemande statut) {
+        // ne renvoie que les demandes de l'entreprise de l'utilisateur connecté
+        Long entrepriseId = utilisateurCourant.entreprise().getId();
         List<Demande> demandes = (statut == null)
-                ? demandeRepository.findAll()
-                : demandeRepository.findByStatut(statut);
+                ? demandeRepository.findByEntrepriseId(entrepriseId)
+                : demandeRepository.findByEntrepriseIdAndStatut(entrepriseId, statut);
         return demandes.stream().map(this::toResponse).toList();
     }
 
     // ---- Détail (interne) ----
     @GetMapping("/{id}")
     public ResponseEntity<DemandeDetailResponse> detail(@PathVariable Long id) {
-        return demandeRepository.findById(id)
-                .map(d -> ResponseEntity.ok(toDetail(d)))
-                .orElse(ResponseEntity.notFound().build());
+        Demande demande = chargerDeMonEntreprise(id);
+        if (demande == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(toDetail(demande));
     }
 
-    // ---- Qualification (interne) : estime + affecte automatiquement ----
+    // ---- Qualification MANUELLE (interne) : estime + affecte automatiquement ----
     @PutMapping("/{id}/qualifier")
     public ResponseEntity<DemandeDetailResponse> qualifier(@PathVariable Long id,
                                                            @Valid @RequestBody QualificationRequest request) {
-        Demande demande = demandeRepository.findById(id).orElse(null);
+        Demande demande = chargerDeMonEntreprise(id);
         if (demande == null) return ResponseEntity.notFound().build();
 
-        demande.setType(request.type());
-        demande.setComplexite(request.complexite());
+        traiterQualification(demande, request.type(), request.complexite(), null);
+        return ResponseEntity.ok(toDetail(demande));
+    }
+
+    // ---- Qualification AUTOMATIQUE par l'IA (interne) ----
+    @PostMapping("/{id}/analyser")
+    public ResponseEntity<DemandeDetailResponse> analyser(@PathVariable Long id) {
+        Demande demande = chargerDeMonEntreprise(id);
+        if (demande == null) return ResponseEntity.notFound().build();
+
+        // L'IA détermine le type et la complexité à partir de la description
+        ClassificationIa ia = iaClient.classifier(demande.getDescription());
+        traiterQualification(demande, ia.type(), ia.complexite(), ia.scoreConfiance());
+        return ResponseEntity.ok(toDetail(demande));
+    }
+
+    // Charge une demande UNIQUEMENT si elle appartient à l'entreprise de l'utilisateur connecté.
+    private Demande chargerDeMonEntreprise(Long id) {
+        Long entrepriseId = utilisateurCourant.entreprise().getId();
+        return demandeRepository.findById(id)
+                .filter(d -> d.getEntreprise() != null && d.getEntreprise().getId().equals(entrepriseId))
+                .orElse(null);
+    }
+
+    // Logique commune : applique la qualification, estime, affecte et met à jour le statut.
+    private void traiterQualification(Demande demande, TypeProjet type, Complexite complexite,
+                                      Double scoreConfiance) {
+        demande.setType(type);
+        demande.setComplexite(complexite);
+        demande.setScoreConfiance(scoreConfiance);
         estimationService.estimer(demande);
         affectationService.affecter(demande);
         demande.setStatut(StatutDemande.QUALIFIEE);
         demandeRepository.save(demande);
-
-        return ResponseEntity.ok(toDetail(demande));
     }
 
     // ---- Suivi de conversion (interne) : changement de statut commercial ----
     @PutMapping("/{id}/statut")
     public ResponseEntity<DemandeDetailResponse> changerStatut(@PathVariable Long id,
                                                                @Valid @RequestBody StatutUpdateRequest request) {
-        Demande demande = demandeRepository.findById(id).orElse(null);
+        Demande demande = chargerDeMonEntreprise(id);
         if (demande == null) return ResponseEntity.notFound().build();
 
         demande.setStatut(request.statut());
@@ -117,7 +152,7 @@ public class DemandeController {
     @PostMapping("/{id}/reaffecter")
     public ResponseEntity<DemandeDetailResponse> reaffecter(@PathVariable Long id,
                                                             @Valid @RequestBody ReaffecterRequest request) {
-        Demande demande = demandeRepository.findById(id).orElse(null);
+        Demande demande = chargerDeMonEntreprise(id);
         if (demande == null) return ResponseEntity.notFound().build();
         Equipe equipe = equipeRepository.findById(request.equipeId()).orElse(null);
         if (equipe == null) return ResponseEntity.badRequest().build();

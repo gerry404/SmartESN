@@ -50,8 +50,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // public
-                        .requestMatchers("/health", "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/demandes").permitAll()
+                        .requestMatchers("/health", "/auth/**", "/public/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/demandes", "/intake").permitAll()
                         // administration : réservé au rôle ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // tout le reste : authentification requise

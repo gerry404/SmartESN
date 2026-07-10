@@ -2,7 +2,6 @@
 import { defineAsyncComponent } from 'vue'
 import BaseButton from './BaseButton.vue'
 import type { CtaContent } from '../../types'
-
 // Lazy-loaded so Three.js ships in its own chunk, only for this section.
 const BrainScene = defineAsyncComponent(() => import('../cta/BrainScene.vue'))
 
@@ -14,17 +13,17 @@ defineProps<{ cta: CtaContent }>()
     <div
       class="relative max-w-[1728px] mx-auto rounded-[40px] overflow-hidden bg-deep-black min-h-[760px] flex items-center justify-center"
     >
-      <!-- 3D brain -->
+      
       <BrainScene />
 
-      <!-- Legibility vignette -->
+      
       <div class="pointer-events-none absolute inset-0 vignette"></div>
 
-      <!-- Content (pass-through so the brain stays draggable) -->
+     
       <div class="relative z-10 flex flex-col items-center text-center px-6 py-24 pointer-events-none">
-        <div class="w-12 h-12 rounded-full border border-white/40 flex items-center justify-center mb-10 backdrop-blur-sm">
-          <span class="text-white font-bold text-xl leading-none">S</span>
-        </div>
+        <!-- <div class="w-12 h-12 rounded-full border border-white/40 flex items-center justify-center mb-10 backdrop-blur-sm">
+           <span class="text-white font-bold text-xl leading-none">S</span>
+        </div>-->
         <h2
           class="font-display text-[44px] md:text-[76px] font-bold text-white tracking-tighter leading-[1.03] mb-10 max-w-4xl text-balance"
         >

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { mdiArrowLeft } from '@mdi/js'
+import MdiIcon from '@/features/landing/components/ui/MdiIcon.vue'
 import { useDemandesStore } from '../stores/demandesStore'
 import * as demandeApi from '../services/demandeService'
 import * as devisApi from '../services/devisService'
@@ -102,8 +104,8 @@ const euros = (n?: number | null) =>
 <template>
   <main class="min-h-screen bg-page-bg px-margin py-12">
     <div class="max-w-[900px] mx-auto">
-      <RouterLink to="/demandes" class="font-label text-[12px] font-bold text-muted hover:text-text">
-        ← Retour aux demandes
+      <RouterLink to="/demandes" class="inline-flex items-center gap-1.5 font-label text-[12px] font-bold text-muted hover:text-text">
+        <MdiIcon :path="mdiArrowLeft" /> Retour aux demandes
       </RouterLink>
 
       <p v-if="store.loading" class="font-body-md text-muted py-10 text-center">Chargement…</p>

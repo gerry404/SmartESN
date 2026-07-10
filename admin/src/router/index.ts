@@ -12,6 +12,18 @@ const router = createRouter({
     },
     ...authRoutes,
 
+    // --- Pages publiques (documentation, contact) ---
+    {
+      path: '/integration',
+      name: 'integration',
+      component: () => import('@/features/docs/views/Integration.vue'),
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('@/features/docs/views/Contact.vue'),
+    },
+
     // --- Espace connecté : sidebar + pages internes ---
     {
       path: '/',
@@ -38,6 +50,11 @@ const router = createRouter({
           path: 'reporting',
           name: 'reporting',
           component: () => import('@/features/reporting/views/Reporting.vue'),
+        },
+        {
+          path: 'chat',
+          name: 'chat',
+          component: () => import('@/features/chat/views/Chat.vue'),
         },
         {
           path: 'projets/:id',

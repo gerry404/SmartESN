@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { mdiArrowRight } from '@mdi/js'
+import MdiIcon from '@/features/landing/components/ui/MdiIcon.vue'
 import { useDemandesStore } from '../stores/demandesStore'
 import { STATUTS, type StatutDemande } from '../types'
 
@@ -95,9 +97,9 @@ function badgeClass(s: StatutDemande): string {
               <td class="px-4 py-3 text-right">
                 <RouterLink
                   :to="`/demandes/${d.id}`"
-                  class="font-label text-[12px] font-bold text-text hover:text-brand-from"
+                  class="inline-flex items-center gap-1 font-label text-[12px] font-bold text-text hover:text-brand-from"
                 >
-                  Ouvrir →
+                  Ouvrir <MdiIcon :path="mdiArrowRight" />
                 </RouterLink>
               </td>
             </tr>

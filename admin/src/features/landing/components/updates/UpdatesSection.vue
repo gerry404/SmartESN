@@ -64,7 +64,7 @@ const rest = computed(() =>
         </Transition>
       </div>
 
-      <!-- Les autres — cliquer pour les mettre à la une -->
+      <!-- Les autres  cliquer pour les mettre à la une -->
       <div class="lg:col-span-5 border-t border-line">
         <article
           v-for="entry in rest"

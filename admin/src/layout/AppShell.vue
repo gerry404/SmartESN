@@ -38,6 +38,7 @@ const nav = computed<NavItem[]>(() => {
       ],
     },
     { label: 'Reporting', icon: 'insights', path: '/reporting' },
+    { label: 'Assistant', icon: 'forum', path: '/chat' },
   ]
   if (auth.user?.role === 'ADMIN') {
     base.push(
@@ -77,10 +78,10 @@ async function onLogout() {
 
 <template>
   <div
-    class="min-h-screen flex bg-page-bg text-text"
+    class="app-fonts h-screen flex overflow-hidden bg-page-bg text-text"
     :style="{
-      '--font-body': `system-ui, -apple-system, 'Segoe UI', Roboto, 'Poppins', sans-serif`,
-      '--font-display': `system-ui, -apple-system, 'Segoe UI', Roboto, 'Poppins', sans-serif`,
+      '--font-body': `'FriendlySans', system-ui, sans-serif`,
+      '--font-display': `'FriendlySans', system-ui, sans-serif`,
       fontFamily: `var(--font-body)`,
     }"
   >
@@ -180,7 +181,7 @@ async function onLogout() {
         <Logo :wordmark="false" />
       </header>
 
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-h-0 overflow-y-auto">
         <RouterView />
       </div>
     </div>

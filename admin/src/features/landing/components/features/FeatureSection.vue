@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import PinnedScenes from '../scenes/PinnedScenes.vue'
 import FeatureVisual from './FeatureVisual.vue'
+import greenTexture from '@/assets/images/hero-frame.jpg'
 import type { FeatureBlock } from '../../types'
 
 const props = defineProps<{ block: FeatureBlock }>()
@@ -10,12 +11,21 @@ const keys = ['analyse', 'qualif', 'source']
 const scenes = computed(() =>
   props.block.items.map((item, i) => ({ ...item, key: keys[i] ?? 'source' })),
 )
+// Nuances de vert (extraites de l'image) : le fond s'assombrit à chaque step.
+const stepColors = ['#F2F6EA', '#E4EFCE', '#D2E4B0']
 const pad = (n: number) => String(n).padStart(2, '0')
 </script>
 
 <template>
-  <PinnedScenes id="produit" :count="scenes.length" :eyebrow="block.eyebrow">
+  <PinnedScenes id="produit" :count="scenes.length" :eyebrow="block.eyebrow" :step-colors="stepColors">
     <template #default="{ activeStep, enabled, sceneClass }">
+      <!-- Halo d'ambiance vert (image), persistant derrière les scènes -->
+      <img
+        :src="greenTexture"
+        alt=""
+        aria-hidden="true"
+        class="hidden lg:block pointer-events-none absolute -right-48 top-1/2 -translate-y-1/2 w-[620px] h-[620px] object-cover rounded-full opacity-25 blur-2xl"
+      />
       <div v-for="(scene, i) in scenes" :key="scene.title" :class="sceneClass(i)">
         <div class="lg:h-full flex items-center px-margin py-[80px] lg:py-0">
           <div

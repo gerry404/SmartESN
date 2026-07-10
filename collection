@@ -356,3 +356,35 @@ POST /auth/register — public
 // Réponse 200 (auto-login)
 { "token": "eyJ...", "email": "gerry@axegroup.com", "role": "ADMIN" }
 Erreurs : 409 (email déjà utilisé), 400 (validation : mot de passe < 6 car., email invalide, champs vides).
+
+
+
+
+┌───────────────────────────┬────────────────────────────────────────────────────┐
+│         Composant         │                        Rôle                        │
+├───────────────────────────┼────────────────────────────────────────────────────┤
+│ Entreprise (+ champs      │ stocke jiraBaseUrl, jiraEmail, jiraApiToken,       │
+│ Jira)                     │ jiraProjectKey de chaque entreprise                │
+├───────────────────────────┼────────────────────────────────────────────────────┤
+│                           │ construit un client authentifié à la volée à       │
+│ JiraClient                │ partir de la config de l'entreprise passée en      │
+│                           │ paramètre (plus de @Value global)                  │
+├───────────────────────────┼────────────────────────────────────────────────────┤
+│ UtilisateurCourantService │ retrouve l'entreprise de l'utilisateur connecté    │
+│                           │ (via le token)                                     │
+├───────────────────────────┼────────────────────────────────────────────────────┤
+│ /decompose (service IA)   │ l'IA découpe le projet en tâches + suggère les     │
+│                           │ assignés                                           │
+├───────────────────────────┼────────────────────────────────────────────────────┤
+│ JiraController            │ 3 endpoints (voir ci-dessous)                      │
+├───────────────────────────┼────────────────────────────────────────────────────┤
+│ AdminController           │ config Jira par l'admin de l'entreprise            │
+└───────────────────────────┴────────────────────────────────────────────────────┘
+
+Les endpoints (contrat pour ton dev) :
+- PUT /admin/jira {baseUrl, email, apiToken, projectKey} → l'admin configure le Jira de son entreprise
+- GET /admin/jira → état (configure: true/false, jamais le token)
+- POST /projets/{id}/decomposer → l'IA génère les tâches (aperçu, enregistrées)
+- GET /projets/{id}/taches → consulter les tâches proposées
+- POST /projets/{id}/jira/push → crée les tâches dans le Jira de l'entreprise connectée
+

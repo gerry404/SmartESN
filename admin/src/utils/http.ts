@@ -22,6 +22,13 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
   const data = isJson ? await res.json() : await res.text()
 
   if (!res.ok) {
+    // 401 : token absent/expiré → purge + redirection vers login (sauf si on y est déjà).
+    if (res.status === 401) {
+      localStorage.removeItem('auth_token')
+      if (!location.pathname.startsWith('/login')) {
+        location.assign('/login?redirect=' + encodeURIComponent(location.pathname))
+      }
+    }
     const message =
       data && typeof data === 'object' && 'message' in data
         ? String((data as { message: unknown }).message)

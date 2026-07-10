@@ -8,9 +8,10 @@ export interface Credentials{
   password: string
 }
 export interface RegisterPayload {
-    name: string
+    nomEntreprise: string
+    nomAdmin: string
     email: string
-    password: string
+    motDePasse: string
 }
 export interface AuthResponse{
   token: string

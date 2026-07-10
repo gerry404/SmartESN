@@ -36,7 +36,22 @@ export const useAuthStore = defineStore('auth',() => {
     }
   }
 
-
+  async function register(payload: RegisterPayload): Promise<boolean> {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await authService.register(payload)
+      // Le backend fait un auto-login : on récupère directement le token + rôle.
+      setToken(res.token)
+      user.value = { email: res.email, role: res.role }
+      return true
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Inscription impossible.'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
 
   async function fetchMe(): Promise<void> {
     if (!token.value) return

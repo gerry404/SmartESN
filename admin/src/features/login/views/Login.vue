@@ -33,7 +33,7 @@ async function onSubmit() {
 <template>
     <main class="min-h-screen flex items-center justify-center bg-page-bg px-margin py-16">
         <div class="w-full max-w-md">
-            <RouterLink to="/" class="inline-block mb-10"><Logo /></RouterLink>
+          <!--  <RouterLink to="/" class="inline-block mb-10"><Logo mark="stack" /></RouterLink> -->
 
         <h1 class="font-display text-4xl font-bold tracking-tight text-text mb-2">Connexion</h1>
         <p class="font-body-md text-muted mb-8">Accedez a votre espace. </p>

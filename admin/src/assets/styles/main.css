@@ -7,31 +7,31 @@
 /* HiJO — 5 graisses (texte + UI) */
 @font-face {
   font-family: 'HiJO';
-  src: url('../fonts/HiJOThin.otf') format('opentype');
+  src: url('../fonts/Golifez Bright Serif - Personal Demo.otf') format('opentype');
   font-weight: 100;
   font-display: swap;
 }
 @font-face {
   font-family: 'HiJO';
-  src: url('../fonts/HiJOLight.otf') format('opentype');
+  src: url('../fonts/Golifez Bright Serif - Personal Demo.otf') format('opentype');
   font-weight: 300;
   font-display: swap;
 }
 @font-face {
   font-family: 'HiJO';
-  src: url('../fonts/HiJORegular.otf') format('opentype');
+  src: url('../fonts/Golifez Bright Serif - Personal Demo.otf') format('opentype');
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: 'HiJO';
-  src: url('../fonts/HiJOBold.otf') format('opentype');
+  src: url('../fonts/Golifez Bright Serif - Personal Demo.otf') format('opentype');
   font-weight: 700;
   font-display: swap;
 }
 @font-face {
   font-family: 'HiJO';
-  src: url('../fonts/HiJOBlack.otf') format('opentype');
+  src: url('../fonts/Golifez Bright Serif - Personal Demo.otf') format('opentype');
   font-weight: 900;
   font-display: swap;
 }
@@ -41,6 +41,28 @@
   font-family: 'Roundex';
   src: url('../fonts/Roundex.otf') format('opentype');
   font-weight: normal;
+  font-display: swap;
+}
+
+/* Polices du tableau de bord (espace connecté) */
+@font-face {
+  font-family: 'FriendlySans';
+  src: url('../fonts/FriendlySans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FriendlySans';
+  src: url('../fonts/FriendlySans-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OtflagSans';
+  src: url('../fonts/OtflagSans-Medium.otf') format('opentype');
+  font-weight: 500;
   font-display: swap;
 }
 
@@ -58,6 +80,14 @@
   body {
     @apply bg-page-bg text-text font-body-lg antialiased;
   }
+}
+
+/* Espace connecté : FriendlySans-Regular comme police principale (tout le dashboard). */
+.app-fonts,
+.app-fonts h1,
+.app-fonts h2,
+.app-fonts h3 {
+  font-family: 'FriendlySans', system-ui, sans-serif;
 }
 
 @layer utilities {

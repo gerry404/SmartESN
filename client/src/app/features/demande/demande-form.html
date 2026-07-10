@@ -1,0 +1,85 @@
+<section class="demande">
+  <header class="demande__head">
+    <h1>Décrivez votre projet</h1>
+    <p class="demande__sub">Notre assistant vous pose quelques questions pour bien cadrer votre besoin.</p>
+  </header>
+
+  @if (phase() !== 'confirmation') {
+    <div class="progress" role="progressbar" [attr.aria-valuenow]="progression()" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress__bar" [style.width.%]="progression()"></div>
+    </div>
+  }
+
+  @if (historique().length) {
+    <ul class="fil">
+      @for (e of historique(); track $index) {
+        <li class="fil__item">
+          <span class="fil__q">{{ e.question }}</span>
+          <span class="fil__r">{{ e.reponse }}</span>
+        </li>
+      }
+    </ul>
+  }
+
+  @switch (phase()) {
+    @case ('saisie') {
+      <form [formGroup]="saisieForm" (ngSubmit)="demarrer()" class="card">
+        <label for="texte" class="label">Votre projet</label>
+        <textarea id="texte" formControlName="texte" rows="6"
+          placeholder="Ex. un site vitrine avec prise de rendez-vous en ligne…"></textarea>
+        <button type="submit" class="btn" [disabled]="saisieForm.invalid">Analyser</button>
+      </form>
+    }
+
+    @case ('analyse') { <p class="loader">Analyse de votre besoin…</p> }
+    @case ('envoi')   { <p class="loader">Envoi de votre demande…</p> }
+
+    @case ('questions') {
+      <form (ngSubmit)="envoyerReponses()" class="card">
+        <p class="hint">Quelques précisions :</p>
+        @for (q of analyse()!.questions; track $index) {
+          <div class="field">
+            <label class="label" [attr.for]="'q' + $index">{{ q }}</label>
+            <input [id]="'q' + $index" [value]="reponses()[$index]"
+              (input)="majReponse($index, $any($event.target).value)" />
+          </div>
+        }
+        <button type="submit" class="btn">Continuer</button>
+      </form>
+    }
+
+    @case ('coordonnees') {
+      <form [formGroup]="coordForm" (ngSubmit)="soumettre()" class="card">
+        <div class="field">
+          <label class="label" for="nom">Nom</label>
+          <input id="nom" formControlName="nom" />
+          @if (fieldErrors()['nom']) { <small class="err">{{ fieldErrors()['nom'] }}</small> }
+        </div>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input id="email" formControlName="email" type="email" />
+          @if (fieldErrors()['email']) { <small class="err">{{ fieldErrors()['email'] }}</small> }
+        </div>
+        <div class="field">
+          <label class="label" for="tel">Téléphone (optionnel)</label>
+          <input id="tel" formControlName="telephone" />
+        </div>
+        <button type="submit" class="btn" [disabled]="coordForm.invalid">Envoyer ma demande</button>
+      </form>
+    }
+
+    @case ('confirmation') {
+      <div class="card card--ok">
+        <h2>Merci !</h2>
+        <p>Votre demande n°<b>{{ result()!.id }}</b> a bien été reçue.</p>
+      </div>
+    }
+
+    @case ('erreur') {
+      <div class="card card--ko">
+        <p>{{ errorMessage() }}</p>
+        <button type="button" class="btn" (click)="reessayer()">Réessayer</button>
+      </div>
+    }
+  }
+</section>

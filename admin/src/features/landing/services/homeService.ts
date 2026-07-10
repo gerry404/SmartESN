@@ -11,10 +11,15 @@ const IMG = {
   c5: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJHfj4_xGj0yuLj8FKt6X72bCIskF-kJl3LA3T3_1-Qfv6mfKwCLXqKuU41nv1J3p_M1VLaKyUwt7jymaxu9IqrMBeOZwhDvKB2NclDw7qctzcy_CAPxlD6DRpxJ5uMf6G4nCRrvnMp59n2r2y9HaRxoemHYv9Vm4p_TMdRUwKitMvWXTR13rOY5umPLmIVd6L5RMbQMm1ZFC8-WMQdUrzWugK5J4Eh0Ph9XOn2e4G84KG4Az4KXAh3-n2Y52A1ycQ8Ow3OGXHosuz',
   c6: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbheL8VQt2V3qxmEXBukkZcNptuzepd42MEKEg9-qDVlpepWCcPZIR5s9MzcSFv4FH-6IuiF9uWjjxSWg2IQ-A_CdbSU7IbdGFdbRPcFqz1DyoSSA1w-kOaLoqdLsFYVQuBBDENJ0aa2OHfgIFFJ1Y7GClriULppWYz7d7fGuv-GPC_YjW-mQfwtuP1rbtxhAb-IzFfX6o7nj41jI_XdcVGj6on-6bwuQl_W5NMa4g3MvEW_sVCeo4Tgf1W3QkrnYFQKfSyl3ScLps',
   avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxUZpAK7kBAK1H5Anlz-i_nh19XyaGUt1hLDC6ZASnuBK2vRcwFDP46vx7HodMWCGvWJVA3aKLfp00pDRGNPsH0LVYvOGBSQ1KJIx2wTCxFcEJMNlnv9DHJKT0wyVelxRunXJN3d41Z2MPDK4poxQF_iybQaYL4ebVjC52RWnq9U6Y-VA7k5seZ7Z4c1n3nq7ply6CwSNm8-OH_B6wae1-h-Zmn2y3jh9urDyal2zhahuy408MHHCcPTmA9TNKUOA7WEsjuEy1iMvC',
-  brief: 'https://lh3.googleusercontent.com/aida-public/AB6AXuChKRPJn1gSFDrt1GQDzfiU4I3yCzTQVQeuNO8ytisTcKlK31yEv5K86cdWMKJBg3GC95w5q1ERJKHJLKU3w-6SojCl15IPwtoKItbHfym_OWSwde4Lc_X0Q39r2NUE_oZu-ti8_Zs_OibuoUCAcJYE-cSQuZwNsvFjQJC5rdU9maW6xzUq0FkX5WNlRsxq4L4CR7oinVYlFK6v9BDjMPShHM5UEvXrG_3JYGqBIWaiRdb9MTmRBmaZdMBZC44wnynC-oFH9TaZlB9Q',
-  social: 'https://lh3.googleusercontent.com/aida-public/AB6AXuABa0q5BJ_DreMgIZGB-8at3sYpuFks_tT431tznVrVWB2C49LzdUC651wzXTj9LD-7VYCWRRpo9bqyyAQ_b54KnjtoPjXSRfeIXbBgjwHXIr8Ojo51Y8MG8CC0mGtvupgQSf4RnLcvReiqPWlUs5L2KkemFlhV-MfAQAzfyxIvGWfFM2Orh3ChuU5A6sOS2VBQbJyPWAQcwMlr6YWpCbln_V8DC4Yo90e6mK4QAINc-FrScaJ_KPin-t6UJ12p4Dnl5CbWpvGS2GiO',
-  deck: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCAsZf4UPkmlE6_mXYyjLE0rRS6z3wyPwTyXyHBEx2fzb_1GTK9oiAbqHMYNp1BpaU32inyxnVzpmayXVCbCKB_1Vo5pWerZ__YxCtY56FNpcHMwYf9urWgXAJQyGfscYHxMbULHWIsDeg5XCImbVDEPCwNhnAFC1xNYFgDTRv4KBYk1lGhIhBi4Pez_FSe2stW1TrgJkEhZUjpZcpgdrnwOaIDJo-2fibASWue5TrVKAp0CiX5ahI1LePNwx8xkgPfEO5mMALLcQWo',
-  voice: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB5cY_8WSiYE8XLX9-TC1PN-9mihq_rEdAuIWhtvcYj7w3Jym37KSRruLnz0ZQY5zy1_DktUdT0RLTDQ4dIOGeKAvBWKyz6Fg4AS8M9VGl8uRkbhFz7qmqDNDpZ-CnVzYng1m39Wxi--hMoM4aMjONRhxBfdlgygDuhMZXzobuhZkCisfF6llXxrL9fOU48PhgyUNZx5V5gH-adc6HxffpgIWavNNpFCUnafc-d7HEDWlEQx3S8yVrTddmzqlMzQIOc0ib4Bxpxxe-W',
+  // Images libres (Unsplash) choisies pour coller au thème de chaque carte.
+  brief:
+    'https://images.unsplash.com/photo-1603796846097-bee99e4a601f?auto=format&fit=crop&w=1200&q=80', // documents / appels d'offres
+  social:
+    'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=80', // deal / propositions
+  deck:
+    'https://images.unsplash.com/photo-1532622785990-d2c36a76f5a6?auto=format&fit=crop&w=1200&q=80', // cadrage / planning d'équipe
+  voice:
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80', // dashboard / pilotage
 }
 
 const homeContent: HomeContent = {
@@ -29,11 +34,11 @@ const homeContent: HomeContent = {
     cta: 'Commencer',
   },
   hero: {
-    title: 'Qualifiez et chiffrez chaque demande client en minutes',
+    title: 'De la demande au devis, en quelques minutes.',
     subtitle:
-      "SmartESN analyse vos appels d'offres et demandes entrantes, en extrait le besoin, et produit une qualification et un chiffrage fiables , pour que vos équipes avant-vente se concentrent sur ce qui compte.",
+      "SmartESN lit vos appels d'offres, cahiers des charges et e-mails, en extrait le besoin réel, puis produit une qualification et un chiffrage cohérents, pour que vos équipes avant-vente passent plus de temps avec les clients qu'à ressaisir des documents.",
     image: IMG.hero,
-    imageAlt: "Tableau de bord SmartESN de qualification des demandes",
+    imageAlt: 'Tableau de bord SmartESN de qualification des demandes',
     primaryCta: 'Demander une démo',
     secondaryCta: 'Voir le produit',
   },
@@ -97,7 +102,7 @@ const homeContent: HomeContent = {
     ],
   },
   manifesto:
-    "À mesure que les demandes clients affluent ; appels d'offres, cahiers des charges, e-mails , disposer d'une lecture unique et fiable du besoin n'a jamais été aussi décisif. SmartESN unifie la qualification et le chiffrage de votre avant-vente.",
+    "Chaque jour, les demandes affluent : appels d'offres, cahiers des charges, e-mails. Les qualifier et les chiffrer à la main est lent, inégal et coûteux. SmartESN unifie votre avant-vente autour d'une seule lecture du besoin  fiable et partagée, du premier contact au devis.",
   featureBlocks: [
     {
       eyebrow: 'Produit',
@@ -106,17 +111,17 @@ const homeContent: HomeContent = {
         {
           title: 'Analyse automatique des demandes',
           description:
-            "Importez un cahier des charges ou un appel d'offres : SmartESN en extrait le périmètre, les technologies, les livrables et les contraintes.",
+            "Déposez un cahier des charges ou un appel d'offres : SmartESN en extrait le périmètre, les technologies, les livrables et les contraintes  en quelques secondes.",
         },
         {
-          title: 'Qualification contextuelle',
+          title: 'Qualification en un coup d’œil',
           description:
-            "Notre IA comprend le contexte métier de vos clients et met en évidence les risques, les zones d'ombre et les questions à poser.",
+            "SmartESN replace la demande dans son contexte métier, évalue l'opportunité et propose un go / no-go argumenté — type, complexité et budget indicatif inclus.",
         },
         {
           title: 'Source de vérité unique',
           description:
-            "Toutes vos demandes, qualifications et chiffrages réunis dans un espace cohérent, recherchable et partagé entre les équipes.",
+            'Demandes, qualifications et chiffrages réunis dans un espace cohérent, recherchable et partagé  fini les fichiers éparpillés.',
         },
       ],
     },
@@ -128,17 +133,17 @@ const homeContent: HomeContent = {
       {
         title: 'Chiffrage assisté',
         description:
-          "Estimation des charges par lot, profils mobilisés et durée , à partir de vos référentiels de projets passés.",
+          'Charges par lot, profils mobilisés et durée, estimés à partir de vos projets passés  pas d’un tableur reparti de zéro.',
       },
       {
         title: 'Hypothèses transparentes',
         description:
-          "Chaque estimation est justifiée : hypothèses, risques et facteurs de complexité sont explicités.",
+          'Chaque estimation est justifiée : hypothèses, risques et facteurs de complexité explicités, prêts à défendre devant le client.',
       },
       {
         title: 'Historique & apprentissage',
         description:
-          "SmartESN s'améliore à partir de vos affaires gagnées pour affiner ses estimations au fil du temps.",
+          "SmartESN apprend de vos affaires gagnées pour affiner ses estimations au fil du temps.",
       },
     ],
     promptLabel: 'SMARTESN STUDIO',
@@ -241,14 +246,14 @@ const homeContent: HomeContent = {
           { label: 'À propos', href: '#' },
           { label: 'Carrières', href: '#' },
           { label: 'Actualités', href: '#' },
-          { label: 'Contact', href: '#' },
+          { label: 'Contact', href: '/contact' },
         ],
       },
       {
         title: 'Ressources',
         links: [
           { label: 'Blog', href: '#' },
-          { label: 'Documentation', href: '#' },
+          { label: 'Documentation', href: '/integration' },
           { label: 'Communauté', href: '#' },
           { label: 'Support', href: '#' },
         ],

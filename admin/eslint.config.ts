@@ -25,5 +25,15 @@ export default defineConfigWithVueTs(
     files: ['src/**/__tests__/*'],
   },
 
+  {
+    // Les vues/pages portent un nom d'un seul mot (Home, Login, Dashboard…),
+    // convention normale : on désactive la règle ici seulement.
+    name: 'app/views-single-word-names',
+    files: ['**/views/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 )

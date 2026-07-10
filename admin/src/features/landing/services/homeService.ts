@@ -34,9 +34,9 @@ const homeContent: HomeContent = {
     cta: 'Commencer',
   },
   hero: {
-    title: 'De la demande au devis fiable, en quelques minutes.',
+    title: 'De la demande au devis, en quelques minutes.',
     subtitle:
-      "SmartESN lit vos appels d'offres, cahiers des charges et e-mails, en extrait le besoin réel, puis produit une qualification et un chiffrage cohérents — pour que vos équipes avant-vente passent plus de temps avec les clients qu'à ressaisir des documents.",
+      "SmartESN lit vos appels d'offres, cahiers des charges et e-mails, en extrait le besoin réel, puis produit une qualification et un chiffrage cohérents, pour que vos équipes avant-vente passent plus de temps avec les clients qu'à ressaisir des documents.",
     image: IMG.hero,
     imageAlt: 'Tableau de bord SmartESN de qualification des demandes',
     primaryCta: 'Demander une démo',
@@ -102,7 +102,7 @@ const homeContent: HomeContent = {
     ],
   },
   manifesto:
-    "Chaque jour, les demandes affluent : appels d'offres, cahiers des charges, e-mails. Les qualifier et les chiffrer à la main est lent, inégal et coûteux. SmartESN unifie votre avant-vente autour d'une seule lecture du besoin — fiable et partagée, du premier contact au devis.",
+    "Chaque jour, les demandes affluent : appels d'offres, cahiers des charges, e-mails. Les qualifier et les chiffrer à la main est lent, inégal et coûteux. SmartESN unifie votre avant-vente autour d'une seule lecture du besoin  fiable et partagée, du premier contact au devis.",
   featureBlocks: [
     {
       eyebrow: 'Produit',
@@ -111,17 +111,17 @@ const homeContent: HomeContent = {
         {
           title: 'Analyse automatique des demandes',
           description:
-            "Déposez un cahier des charges ou un appel d'offres : SmartESN en extrait le périmètre, les technologies, les livrables et les contraintes — en quelques secondes.",
+            "Déposez un cahier des charges ou un appel d'offres : SmartESN en extrait le périmètre, les technologies, les livrables et les contraintes  en quelques secondes.",
         },
         {
-          title: 'Qualification contextuelle',
+          title: 'Qualification en un coup d’œil',
           description:
-            "L'IA comprend le contexte métier, met en évidence les risques, les zones d'ombre et les bonnes questions à poser avant de s'engager.",
+            "SmartESN replace la demande dans son contexte métier, évalue l'opportunité et propose un go / no-go argumenté — type, complexité et budget indicatif inclus.",
         },
         {
           title: 'Source de vérité unique',
           description:
-            'Demandes, qualifications et chiffrages réunis dans un espace cohérent, recherchable et partagé — fini les fichiers éparpillés.',
+            'Demandes, qualifications et chiffrages réunis dans un espace cohérent, recherchable et partagé  fini les fichiers éparpillés.',
         },
       ],
     },
@@ -133,7 +133,7 @@ const homeContent: HomeContent = {
       {
         title: 'Chiffrage assisté',
         description:
-          'Charges par lot, profils mobilisés et durée, estimés à partir de vos projets passés — pas d’un tableur reparti de zéro.',
+          'Charges par lot, profils mobilisés et durée, estimés à partir de vos projets passés  pas d’un tableur reparti de zéro.',
       },
       {
         title: 'Hypothèses transparentes',
@@ -246,14 +246,14 @@ const homeContent: HomeContent = {
           { label: 'À propos', href: '#' },
           { label: 'Carrières', href: '#' },
           { label: 'Actualités', href: '#' },
-          { label: 'Contact', href: '#' },
+          { label: 'Contact', href: '/contact' },
         ],
       },
       {
         title: 'Ressources',
         links: [
           { label: 'Blog', href: '#' },
-          { label: 'Documentation', href: '#' },
+          { label: 'Documentation', href: '/integration' },
           { label: 'Communauté', href: '#' },
           { label: 'Support', href: '#' },
         ],

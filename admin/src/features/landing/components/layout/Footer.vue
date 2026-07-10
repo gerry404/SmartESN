@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import BaseIcon from '../ui/BaseIcon.vue'
 import Logo from '../ui/Logo.vue'
 import type { HomeContent } from '../../types'
@@ -9,6 +10,9 @@ defineProps<{
 }>()
 
 const socials = ['share', 'public', 'hub']
+
+// Un lien interne (route SPA) commence par '/', sinon c'est une ancre/externe.
+const isInternal = (href: string) => href.startsWith('/')
 </script>
 
 <template>
@@ -36,9 +40,18 @@ const socials = ['share', 'public', 'hub']
           <h4 class="font-label text-white mb-6 uppercase tracking-widest text-[10px]">{{ col.title }}</h4>
           <ul class="flex flex-col gap-4">
             <li v-for="link in col.links" :key="link.label">
-              <a class="font-body-md text-white/60 hover:text-white transition-colors" :href="link.href">{{
-                link.label
-              }}</a>
+              <RouterLink
+                v-if="isInternal(link.href)"
+                class="font-body-md text-white/60 hover:text-white transition-colors"
+                :to="link.href"
+                >{{ link.label }}</RouterLink
+              >
+              <a
+                v-else
+                class="font-body-md text-white/60 hover:text-white transition-colors"
+                :href="link.href"
+                >{{ link.label }}</a
+              >
             </li>
           </ul>
         </div>

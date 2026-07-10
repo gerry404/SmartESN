@@ -37,7 +37,7 @@ const wrapperStyle = computed(() =>
 
           <!-- Visual panel: changes with the active step -->
           <div
-            class="bg-gradient-to-tr from-[#E3F0CE] to-[#D3E7B4] rounded-[40px] p-8 h-[700px] flex items-center justify-center relative overflow-hidden border border-line/30 shadow-inner order-1 lg:order-2"
+            class="bg-gradient-to-br from-[#EAF2DC] to-[#DCEBC4] rounded-[40px] p-12 h-[560px] flex items-center justify-center relative overflow-hidden order-1 lg:order-2"
           >
             <Transition name="studio-swap" mode="out-in">
               <StudioVisual :key="activeStep" :variant="variantKey" :prompt="studio.promptText" />

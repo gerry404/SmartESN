@@ -15,3 +15,4 @@ export function getTaches(projetId: number): Promise<Tache[]> {
 export function pushJira(projetId: number): Promise<Tache[]> {
   return http<Tache[]>(`/projets/${projetId}/jira/push`, { method: 'POST' })
 }
+

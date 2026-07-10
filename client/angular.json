@@ -60,6 +60,18 @@
           },
           "defaultConfiguration": "production"
         },
+        "build-elements": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.elements.ts",
+            "tsConfig": "tsconfig.app.json",
+            "outputPath": "dist/elements",
+            "index": false,
+            "styles": [],
+            "optimization": true,
+            "outputHashing": "none"
+          }
+        },
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {

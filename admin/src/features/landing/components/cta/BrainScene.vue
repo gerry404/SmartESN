@@ -22,7 +22,7 @@ let entrance = 0
 let entranceArmed = false
 const clock = new THREE.Clock()
 
-// pointer parallax
+
 const ptr = { x: 0, y: 0, tx: 0, ty: 0 }
 
 let ro: ResizeObserver
@@ -90,13 +90,12 @@ onMounted(() => {
   renderer.toneMappingExposure = 1.05
   el.appendChild(renderer.domElement)
 
-  // Environment gives realistic PBR reflections for the model's own textures
+ 
   const pmrem = new THREE.PMREMGenerator(renderer)
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
   pmrem.dispose()
 
-  // Mostly neutral studio lighting (keeps the original texture true),
-  // with a subtle brand-coloured rim for cohesion with the dark section.
+
   const key = new THREE.DirectionalLight(0xffffff, 2.2)
   key.position.set(3, 5, 4)
   scene.add(key)
@@ -126,8 +125,7 @@ onMounted(() => {
       const maxDim = Math.max(size.x, size.y, size.z) || 1
       brain.scale.setScalar(3.4 / maxDim)
 
-      // Keep the model's original textures, but apply a light green tint (multiply)
-      // so the reddish "brain" harmonises with the green theme.
+
       const tint = new THREE.Color(0x9fc36a)
       brain.traverse((o) => {
         const mesh = o as THREE.Mesh

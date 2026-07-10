@@ -33,7 +33,7 @@ const steps = [
       <!-- Editorial header: heading left, lead right -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end mb-20 lg:mb-28">
         <div class="lg:col-span-7">
-          <span class="font-label text-[12px] font-bold uppercase tracking-[0.2em] text-muted">Avant-vente</span>
+      <!--    <span class="font-label text-[12px] font-bold uppercase tracking-[0.2em] text-muted">Avant-vente</span> -->
           <h2 class="mt-5 font-display font-bold tracking-tight leading-[0.95] text-5xl sm:text-7xl text-text">
             <template v-for="(line, i) in title" :key="i">
               {{ line }}<br v-if="i < title.length - 1" />
@@ -79,7 +79,7 @@ const steps = [
       <!-- Quiet closing line -->
       <p class="mt-14 font-body-md text-[15px] text-muted flex items-center gap-3">
         <span class="w-8 h-px bg-text/40"></span>
-        Une seule lecture du besoin, fiable et partagée — en continu.
+        Une seule lecture du besoin, fiable et partagée en continu.
       </p>
     </div>
   </section>

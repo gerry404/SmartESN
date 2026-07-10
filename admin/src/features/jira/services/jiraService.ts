@@ -13,3 +13,4 @@ export function saveJiraConfig(body: JiraConfigPayload): Promise<JiraConfigStatu
     body: JSON.stringify(body),
   })
 }
+

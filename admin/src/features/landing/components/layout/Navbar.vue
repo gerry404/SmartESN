@@ -2,6 +2,7 @@
 import BaseButton from '../ui/BaseButton.vue'
 import Logo from '../ui/Logo.vue'
 import type { NavLink } from '../../types'
+import { RouterLink } from 'vue-router'
 
 defineProps<{
   brand: string
@@ -31,7 +32,9 @@ defineProps<{
           >
         </nav>
       </div>
+      <RouterLink to="/login">
       <BaseButton variant="light" size="sm" class="font-semibold">{{ cta }}</BaseButton>
+      </RouterLink>
     </div>
   </header>
 </template>

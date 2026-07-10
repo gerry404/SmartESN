@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    /** Text colour context: 'dark' on light bg, 'light' on dark bg. */
+    
     variant?: 'dark' | 'light'
     /** Show the "SmartESN" wordmark next to the mark. */
     wordmark?: boolean

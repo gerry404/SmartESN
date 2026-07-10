@@ -8,6 +8,7 @@ import Manifesto from '../components/manifesto/Manifesto.vue'
 import FloatingCollage from '../components/collage/FloatingCollage.vue'
 import FeatureSection from '../components/features/FeatureSection.vue'
 import StudioSection from '../components/studio/StudioSection.vue'
+import IntakeSection from '../components/intake/IntakeSection.vue'
 import TeamSection from '../components/teams/TeamSection.vue'
 import UpdatesSection from '../components/updates/UpdatesSection.vue'
 // import Testimonial from '../components/testimonial/Testimonial.vue'
@@ -45,6 +46,9 @@ const { content } = useHome()
 
       <!-- Produit en profondeur (steps) -->
       <StudioSection :studio="content.studio" />
+
+      <!-- Formulaire vivant : capter et qualifier la demande à la source -->
+      <IntakeSection />
 
       <!-- Ressources -->
       <UpdatesSection :updates="content.updates" />

@@ -57,6 +57,11 @@ const router = createRouter({
           component: () => import('@/features/chat/views/Chat.vue'),
         },
         {
+          path: 'partager',
+          name: 'partager',
+          component: () => import('@/features/partage/views/PartagerFormulaire.vue'),
+        },
+        {
           path: 'projets/:id',
           name: 'projet-taches',
           component: () => import('@/features/jira/views/ProjetTaches.vue'),

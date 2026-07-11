@@ -7,8 +7,11 @@ import com.example.backend.service.*;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,6 +29,26 @@ public class AuthController {
         this.entrepriseRepository = entrepriseRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+    }
+
+    // ---- Profil de l'utilisateur connecté (à partir du token) ----
+    @GetMapping("/me")
+    public ResponseEntity<?> me() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            return ResponseEntity.status(401).build();
+        }
+        String email = (String) auth.getPrincipal();
+        return utilisateurRepository.findByEmail(email)
+                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(
+                        Map.of("email", u.getEmail(), "role", u.getRole().name())))
+                .orElse(ResponseEntity.status(401).build());
+    }
+
+    // ---- Déconnexion (stateless : rien à invalider côté serveur) ----
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.noContent().build();
     }
 
     // ---- Inscription d'une entreprise : crée l'entreprise + son premier admin ----

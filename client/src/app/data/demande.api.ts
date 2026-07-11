@@ -40,6 +40,18 @@ export class DemandeApi {
     });
   }
 
+  /** Envoie un fichier (document, image, audio) : l'IA en extrait le contenu utile. */
+  extraireFichier(file: File, opts: ApiOptions = {}): Observable<{ type_fichier: string; texte: string }> {
+    const data = new FormData();
+    data.append('file', file);
+    // pas de Content-Type manuel : le navigateur pose le multipart/form-data avec la boundary
+    return this.http.post<{ type_fichier: string; texte: string }>(
+      `${opts.baseUrl ?? this.base}/intake/fichier`,
+      data,
+      { headers: this.headers(opts) },
+    );
+  }
+
   // Ajoute la clé entreprise en en-tête si fournie (adaptez au contrat backend).
   private headers(opts: ApiOptions): Record<string, string> {
     return opts.entrepriseKey ? { 'X-Entreprise-Key': opts.entrepriseKey } : {};

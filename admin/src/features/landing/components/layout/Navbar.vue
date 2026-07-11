@@ -19,7 +19,7 @@ defineProps<{
       class="pointer-events-auto w-full max-w-[990px] flex items-center justify-between bg-black  rounded-[60px] px-xs py-xs shadow-xl border border-white/10 h-[70px]"
     >
       <div class="flex items-center gap-md pl-xs">
-        <a href="#" aria-label="SmartESN" class="shrink-0">
+        <a href="#top" aria-label="SmartESN" class="shrink-0">
           <Logo variant="light" mark="stack" />
         </a>
         <nav class="hidden md:flex items-center gap-6">

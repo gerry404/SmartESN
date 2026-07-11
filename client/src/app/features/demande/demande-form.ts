@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -51,8 +52,23 @@ export class DemandeForm {
   /** Émis quand la demande est enregistrée (id, statut…). */
   readonly submitted = output<DemandeResponse>();
 
+  // Clé entreprise capturée UNE fois et conservée, même si l'URL perd le query param.
+  private readonly cleStable = signal<string | undefined>(undefined);
+  constructor() {
+    // au 1er rendu, mémorise la clé (query param) et ne la reperd plus
+    effect(() => {
+      const k = this.entrepriseKey();
+      if (k && k.trim()) this.cleStable.set(k.trim());
+    });
+    // secours : lit aussi directement l'URL au démarrage (uniquement côté navigateur, pas SSR)
+    if (typeof window !== 'undefined') {
+      const fromUrl = new URLSearchParams(window.location.search).get('entrepriseKey');
+      if (fromUrl) this.cleStable.set(fromUrl);
+    }
+  }
+
   private opts(): ApiOptions {
-    return { baseUrl: this.apiBaseUrl(), entrepriseKey: this.entrepriseKey() };
+    return { baseUrl: this.apiBaseUrl(), entrepriseKey: this.cleStable() };
   }
 
   // --- état ---
@@ -65,6 +81,12 @@ export class DemandeForm {
   readonly result = signal<DemandeResponse | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly fieldErrors = signal<FieldErrors>({});
+
+  // Le formulaire est obligatoirement rattaché à une entreprise (via le lien partagé).
+  readonly lienValide = computed(() => {
+    const k = this.cleStable();
+    return !!k && k.trim().length > 0;
+  });
 
   // --- dérivés ---
   readonly progression = computed(() => {
@@ -83,6 +105,40 @@ export class DemandeForm {
     email: ['', [Validators.required, Validators.email]],
     telephone: [''],
   });
+
+  // --- upload de fichier (document, image, audio) ---
+  readonly fichierEnCours = signal(false);
+  readonly fichierNom = signal<string | null>(null);
+  readonly fichierErreur = signal<string | null>(null);
+
+  onFichier(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.fichierEnCours.set(true);
+    this.fichierErreur.set(null);
+    this.fichierNom.set(file.name);
+
+    this.api.extraireFichier(file, this.opts()).subscribe({
+      next: (res) => {
+        // le contenu extrait enrichit la zone de description
+        const actuel = this.saisieForm.getRawValue().texte.trim();
+        const ajout = `\n[Contenu du fichier « ${file.name} » : ${res.texte}]`;
+        this.saisieForm.patchValue({ texte: (actuel + ajout).trim() });
+        this.fichierEnCours.set(false);
+      },
+      error: (e: HttpErrorResponse) => {
+        this.fichierErreur.set(
+          e.status === 502
+            ? "L'analyse du fichier est momentanément indisponible."
+            : "Impossible de lire ce fichier.",
+        );
+        this.fichierEnCours.set(false);
+        this.fichierNom.set(null);
+      },
+    });
+    input.value = ''; // permet de re-sélectionner le même fichier
+  }
 
   // ---------- étape 1 : première analyse ----------
   demarrer(): void {

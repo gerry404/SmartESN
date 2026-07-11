@@ -43,23 +43,6 @@ const kpis = computed(() => {
   ]
 })
 
-// Lien partageable du formulaire vivant (clé entreprise dérivée de l'email en attendant le backend).
-const formLink = computed(() => {
-  const domain = auth.user?.email?.split('@')[1]?.split('.')[0] ?? 'demo'
-  return `https://form.smartesn.com/?ent=ent_pub_${domain}`
-})
-const copied = ref(false)
-function copier() {
-  navigator.clipboard?.writeText(formLink.value).then(() => {
-    copied.value = true
-    setTimeout(() => (copied.value = false), 2000)
-  })
-}
-const mailto = computed(
-  () =>
-    `mailto:?subject=${encodeURIComponent('Décrivez votre projet — SmartESN')}` +
-    `&body=${encodeURIComponent('Bonjour,\n\nMerci de décrire votre besoin via ce formulaire :\n' + formLink.value + '\n\nBien à vous.')}`,
-)
 
 function badgeClass(st: StatutDemande): string {
   const map: Record<StatutDemande, string> = {
@@ -125,32 +108,18 @@ function badgeClass(st: StatutDemande): string {
       </div>
     </div>
 
-    <!-- Partager le formulaire vivant -->
-    <div class="rounded-2xl border border-line bg-white-card p-6 mt-6">
-      <h2 class="text-lg font-bold mb-1">Partager votre formulaire</h2>
-      <p class="text-muted text-[14px] mb-5">
-        Envoyez ce lien à un prospect : il décrit son besoin, vous le recevez déjà qualifié.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input
-          :value="formLink"
-          readonly
-          class="flex-1 rounded-xl bg-page-bg px-4 py-3 text-[14px] text-muted outline-none"
-          @focus="($event.target as HTMLInputElement).select()"
-        />
-        <button
-          class="rounded-xl bg-black text-white px-5 py-3 text-[13px] font-bold whitespace-nowrap hover:bg-text/80 transition-colors"
-          @click="copier"
-        >
-          {{ copied ? 'Copié !' : 'Copier le lien' }}
-        </button>
-        <a
-          :href="mailto"
-          class="rounded-xl border border-line px-5 py-3 text-[13px] font-bold whitespace-nowrap text-center hover:bg-soft-card transition-colors"
-        >
-          Envoyer par email
-        </a>
+    <!-- Accès rapide : partager le formulaire (page dédiée) -->
+    <RouterLink
+      to="/partager"
+      class="mt-6 flex items-center justify-between rounded-2xl border border-line bg-white-card p-6 hover:border-text/30 transition-colors"
+    >
+      <div>
+        <h2 class="text-lg font-bold mb-1">Partager votre formulaire</h2>
+        <p class="text-muted text-[14px]">
+          Envoyez votre lien à un prospect : il décrit son besoin, vous le recevez déjà qualifié.
+        </p>
       </div>
-    </div>
+      <MdiIcon :path="mdiArrowRight" class="text-2xl shrink-0 ml-4" />
+    </RouterLink>
   </section>
 </template>

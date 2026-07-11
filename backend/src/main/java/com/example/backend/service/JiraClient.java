@@ -33,6 +33,27 @@ public class JiraClient {
      * Crée une issue (tâche) dans le Jira de l'entreprise et renvoie sa clé (ex. "SMART-42").
      * Corps au format attendu par l'API Jira Cloud v3 (description en "doc" ADF).
      */
+    /** Récupère la liste des projets du Jira de l'entreprise (clé + nom). */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, String>> listerProjets(Entreprise e) {
+        if (!e.jiraConnecte()) {
+            throw new IllegalStateException("Connexion Jira incomplète (URL et jeton requis).");
+        }
+        // /rest/api/3/project/search renvoie { values: [ { key, name, ... } ] }
+        Map<String, Object> reponse = clientPour(e).get()
+                .uri("/rest/api/3/project/search?maxResults=100")
+                .retrieve()
+                .body(Map.class);
+
+        List<Map<String, Object>> values = reponse == null ? List.of()
+                : (List<Map<String, Object>>) reponse.getOrDefault("values", List.of());
+        return values.stream()
+                .map(p -> Map.of(
+                        "key", String.valueOf(p.get("key")),
+                        "name", String.valueOf(p.get("name"))))
+                .toList();
+    }
+
     public String creerTache(Entreprise e, String titre, String description) {
         if (!e.jiraConfigure()) {
             throw new IllegalStateException("L'intégration Jira n'est pas configurée pour cette entreprise.");

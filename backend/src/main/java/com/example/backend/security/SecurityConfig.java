@@ -20,6 +20,9 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
 
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
+
     public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
@@ -29,11 +32,11 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Autorise le frontend (Angular :4200 / Vue :5173) à appeler l'API
+    // Autorise les origines du frontend (configurables via CORS_ORIGINS)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173"));
+        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -51,7 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // public
                         .requestMatchers("/health", "/auth/**", "/public/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/demandes", "/intake").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/demandes", "/intake", "/intake/**").permitAll()
                         // administration : réservé au rôle ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // tout le reste : authentification requise

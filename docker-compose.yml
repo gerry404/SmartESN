@@ -1,0 +1,67 @@
+# SmartESN — orchestration des 4 services + PostgreSQL.
+# Copiez .env.example en .env et renseignez les secrets, puis : docker compose up --build
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: smartesn
+      POSTGRES_USER: smartesn
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartesn -d smartesn"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ai-service:
+    build: ./ai-service
+    environment:
+      LLM_API_URL: ${LLM_API_URL}
+      LLM_API_KEY: ${LLM_API_KEY}
+      LLM_MODEL: ${LLM_MODEL}
+      LLM_VISION_MODEL: ${LLM_VISION_MODEL}
+    expose:
+      - "8000"
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/smartesn
+      DB_USERNAME: smartesn
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      IA_BASE_URL: http://ai-service:8000
+      FORM_BASE_URL: ${FORM_BASE_URL}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    ports:
+      - "8080:8080"
+
+  admin:
+    build:
+      context: ./admin
+      args:
+        # URL publique du backend, intégrée au bundle au moment du build
+        VITE_API_URL: ${PUBLIC_API_URL}
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+  client:
+    build: ./client
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

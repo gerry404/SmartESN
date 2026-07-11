@@ -27,12 +27,14 @@ public class DemandeController {
     private final AffectationService affectationService;
     private final IaClient iaClient;
     private final UtilisateurCourantService utilisateurCourant;
+    private final EntrepriseRepository entrepriseRepository;
 
     public DemandeController(DemandeRepository demandeRepository, ClientRepository clientRepository,
                              EstimationRepository estimationRepository, AffectationRepository affectationRepository,
                              EquipeRepository equipeRepository, ProjetRepository projetRepository,
                              EstimationService estimationService, AffectationService affectationService,
-                             IaClient iaClient, UtilisateurCourantService utilisateurCourant) {
+                             IaClient iaClient, UtilisateurCourantService utilisateurCourant,
+                             EntrepriseRepository entrepriseRepository) {
         this.demandeRepository = demandeRepository;
         this.clientRepository = clientRepository;
         this.estimationRepository = estimationRepository;
@@ -43,11 +45,22 @@ public class DemandeController {
         this.affectationService = affectationService;
         this.iaClient = iaClient;
         this.utilisateurCourant = utilisateurCourant;
+        this.entrepriseRepository = entrepriseRepository;
     }
 
-    // ---- Soumission par le client (public) ----
+    // ---- Soumission par le client via le lien du formulaire (public, multi-tenant) ----
+    // L'en-tête X-Entreprise-Key porte le jeton public de l'entreprise destinataire.
     @PostMapping
-    public DemandeResponse creer(@Valid @RequestBody DemandeCreateRequest request) {
+    public ResponseEntity<?> creer(@RequestHeader(value = "X-Entreprise-Key", required = false) String cle,
+                                   @Valid @RequestBody DemandeCreateRequest request) {
+        if (cle == null || cle.isBlank()) {
+            return ResponseEntity.badRequest().body("En-tête X-Entreprise-Key manquant.");
+        }
+        Entreprise entreprise = entrepriseRepository.findByFormToken(cle).orElse(null);
+        if (entreprise == null) {
+            return ResponseEntity.status(404).body("Lien de formulaire invalide.");
+        }
+
         Client client = clientRepository.findByEmail(request.email())
                 .orElseGet(() -> {
                     Client nouveau = new Client();
@@ -61,7 +74,8 @@ public class DemandeController {
         demande.setDescription(request.description());
         demande.setStatut(StatutDemande.NOUVELLE);
         demande.setClient(client);
-        return toResponse(demandeRepository.save(demande));
+        demande.setEntreprise(entreprise); // rattachement au bon tenant
+        return ResponseEntity.ok(toResponse(demandeRepository.save(demande)));
     }
 
     // ---- Liste, avec filtre optionnel par statut (interne) ----

@@ -1,12 +1,26 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import * as adminApi from '../services/adminService'
 import type { GrilleLigne } from '../types'
+import type { Complexite, TypeProjet } from '@/features/demandes/types'
 
 const lignes = ref<GrilleLigne[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 const savingId = ref<number | null>(null)
+const creating = ref(false)
+
+const TYPES: TypeProjet[] = ['MOBILE', 'WEB', 'DESKTOP', 'CONSEIL']
+const COMPLEXITES: Complexite[] = ['SIMPLE', 'MOYENNE', 'COMPLEXE']
+
+const nouvelle = reactive<Omit<GrilleLigne, 'id'>>({
+  type: 'WEB',
+  complexite: 'SIMPLE',
+  budgetMin: 0,
+  budgetMax: 0,
+  delaiMin: 0,
+  delaiMax: 0,
+})
 
 async function charger() {
   loading.value = true
@@ -40,6 +54,34 @@ async function enregistrer(l: GrilleLigne) {
     savingId.value = null
   }
 }
+
+async function creer() {
+  creating.value = true
+  error.value = null
+  try {
+    const ligne = await adminApi.creerGrilleLigne({ ...nouvelle })
+    lignes.value.push(ligne)
+    nouvelle.budgetMin = 0
+    nouvelle.budgetMax = 0
+    nouvelle.delaiMin = 0
+    nouvelle.delaiMax = 0
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Création impossible.'
+  } finally {
+    creating.value = false
+  }
+}
+
+async function supprimer(l: GrilleLigne) {
+  if (!confirm(`Supprimer la référence ${l.type} / ${l.complexite} ?`)) return
+  error.value = null
+  try {
+    await adminApi.supprimerGrilleLigne(l.id)
+    lignes.value = lignes.value.filter((x) => x.id !== l.id)
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Suppression impossible.'
+  }
+}
 </script>
 
 <template>
@@ -68,14 +110,55 @@ async function enregistrer(l: GrilleLigne) {
               <td class="px-4 py-2"><input v-model.number="l.budgetMax" type="number" class="w-28 rounded-lg border border-line bg-page-bg px-2 py-1.5" /></td>
               <td class="px-4 py-2"><input v-model.number="l.delaiMin" type="number" class="w-20 rounded-lg border border-line bg-page-bg px-2 py-1.5" /></td>
               <td class="px-4 py-2"><input v-model.number="l.delaiMax" type="number" class="w-20 rounded-lg border border-line bg-page-bg px-2 py-1.5" /></td>
-              <td class="px-4 py-2 text-right">
+              <td class="px-4 py-2 text-right whitespace-nowrap">
                 <button :disabled="savingId === l.id" class="font-label text-[12px] font-bold text-text hover:text-brand-from disabled:opacity-50" @click="enregistrer(l)">
                   {{ savingId === l.id ? '…' : 'Enregistrer' }}
+                </button>
+                <button class="ml-4 font-label text-[12px] font-bold text-red-500 hover:text-red-700" @click="supprimer(l)">
+                  Supprimer
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Ajouter une référence -->
+      <div class="mt-8 rounded-2xl border border-line bg-white-card p-6">
+        <h2 class="font-display text-xl font-bold text-text mb-4">Ajouter une référence</h2>
+        <form class="flex flex-wrap items-end gap-4" @submit.prevent="creer">
+          <label class="flex flex-col gap-1">
+            <span class="font-label text-[11px] font-bold uppercase text-muted">Type</span>
+            <select v-model="nouvelle.type" class="rounded-lg border border-line bg-page-bg px-3 py-2">
+              <option v-for="t in TYPES" :key="t" :value="t">{{ t }}</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="font-label text-[11px] font-bold uppercase text-muted">Complexité</span>
+            <select v-model="nouvelle.complexite" class="rounded-lg border border-line bg-page-bg px-3 py-2">
+              <option v-for="c in COMPLEXITES" :key="c" :value="c">{{ c }}</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="font-label text-[11px] font-bold uppercase text-muted">Budget min</span>
+            <input v-model.number="nouvelle.budgetMin" type="number" class="w-28 rounded-lg border border-line bg-page-bg px-2 py-2" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="font-label text-[11px] font-bold uppercase text-muted">Budget max</span>
+            <input v-model.number="nouvelle.budgetMax" type="number" class="w-28 rounded-lg border border-line bg-page-bg px-2 py-2" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="font-label text-[11px] font-bold uppercase text-muted">Délai min</span>
+            <input v-model.number="nouvelle.delaiMin" type="number" class="w-20 rounded-lg border border-line bg-page-bg px-2 py-2" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="font-label text-[11px] font-bold uppercase text-muted">Délai max</span>
+            <input v-model.number="nouvelle.delaiMax" type="number" class="w-20 rounded-lg border border-line bg-page-bg px-2 py-2" />
+          </label>
+          <button :disabled="creating" class="rounded-full bg-black text-white px-6 py-2.5 font-label text-[11px] font-bold uppercase disabled:opacity-50">
+            {{ creating ? 'Ajout…' : 'Ajouter' }}
+          </button>
+        </form>
       </div>
     </div>
   </main>

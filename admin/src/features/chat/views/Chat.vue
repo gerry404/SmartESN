@@ -1,18 +1,37 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import BaseIcon from '@/features/landing/components/ui/BaseIcon.vue'
-import { sendMessage, type ChatMessage } from '../services/chatService'
+import {
+  listConversations,
+  creerConversation,
+  getMessages,
+  sendMessage,
+  supprimerConversation,
+  type ChatMessage,
+  type Conversation,
+} from '../services/chatService'
 
+const conversations = ref<Conversation[]>([])
+const currentId = ref<number | null>(null)
 const messages = ref<ChatMessage[]>([])
 const draft = ref('')
 const thinking = ref(false)
 const scroller = ref<HTMLElement | null>(null)
 
 const suggestions = [
-  'Qualifie cette demande : « app mobile de vente, paiement Mobile Money »',
-  'Estime les charges d’une refonte web React/Node sur 3 mois',
-  'Quelles questions poser avant de chiffrer un projet flou ?',
+  'Quel est mon taux de conversion actuel et comment l’améliorer ?',
+  'Analyse la répartition de mes demandes par statut.',
+  'Quel type de projet me rapporte le plus de chiffre d’affaires ?',
+  'Sur quels projets mon estimation s’écarte le plus du budget signé ?',
 ]
+
+onMounted(async () => {
+  try {
+    conversations.value = await listConversations()
+  } catch {
+    conversations.value = []
+  }
+})
 
 async function scrollBottom() {
   await nextTick()
@@ -20,9 +39,32 @@ async function scrollBottom() {
   if (el) el.scrollTop = el.scrollHeight
 }
 
+// Ouvre une discussion existante et charge ses messages (mémoire)
+async function ouvrir(id: number) {
+  currentId.value = id
+  try {
+    messages.value = await getMessages(id)
+  } catch {
+    messages.value = []
+  }
+  scrollBottom()
+}
+
 async function envoyer(texte?: string) {
   const content = (texte ?? draft.value).trim()
   if (!content || thinking.value) return
+
+  // crée une discussion à la volée si aucune n'est ouverte
+  if (currentId.value === null) {
+    try {
+      const conv = await creerConversation()
+      conversations.value.unshift(conv)
+      currentId.value = conv.id
+    } catch {
+      messages.value.push({ role: 'assistant', content: "Impossible de créer la discussion." })
+      return
+    }
+  }
 
   messages.value.push({ role: 'user', content })
   draft.value = ''
@@ -30,8 +72,10 @@ async function envoyer(texte?: string) {
   scrollBottom()
 
   try {
-    const reply = await sendMessage(messages.value)
+    const reply = await sendMessage(currentId.value!, content)
     messages.value.push({ role: 'assistant', content: reply })
+    // rafraîchit la liste (titre auto + ordre)
+    conversations.value = await listConversations()
   } catch {
     messages.value.push({
       role: 'assistant',
@@ -51,13 +95,58 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 function nouvelle() {
+  currentId.value = null
   messages.value = []
   draft.value = ''
+}
+
+async function supprimer(id: number, e: Event) {
+  e.stopPropagation()
+  try {
+    await supprimerConversation(id)
+    conversations.value = conversations.value.filter((c) => c.id !== id)
+    if (currentId.value === id) nouvelle()
+  } catch {
+    /* ignore */
+  }
 }
 </script>
 
 <template>
-  <div class="h-full flex flex-col bg-page-bg">
+  <div class="h-full flex bg-page-bg">
+    <!-- Sidebar : historique des discussions -->
+    <aside class="hidden md:flex w-64 shrink-0 flex-col border-r border-line bg-white-card">
+      <div class="p-3">
+        <button
+          class="w-full rounded-xl border border-line px-3 py-2 text-[13px] font-semibold flex items-center gap-2 hover:bg-page-bg transition-colors"
+          @click="nouvelle"
+        >
+          <BaseIcon name="add" class="text-lg" /> Nouvelle discussion
+        </button>
+      </div>
+      <div class="flex-1 min-h-0 overflow-y-auto px-2 pb-2">
+        <button
+          v-for="c in conversations"
+          :key="c.id"
+          class="group w-full text-left rounded-lg px-3 py-2 text-[13px] flex items-center justify-between gap-2 transition-colors"
+          :class="c.id === currentId ? 'bg-page-bg font-semibold' : 'hover:bg-page-bg'"
+          @click="ouvrir(c.id)"
+        >
+          <span class="truncate">{{ c.titre }}</span>
+          <BaseIcon
+            name="delete"
+            class="text-base opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0"
+            @click="supprimer(c.id, $event)"
+          />
+        </button>
+        <p v-if="!conversations.length" class="text-center text-[12px] text-muted mt-4">
+          Aucune discussion
+        </p>
+      </div>
+    </aside>
+
+    <!-- Colonne principale -->
+    <div class="flex-1 min-w-0 flex flex-col">
     <!-- Barre supérieure -->
     <header class="shrink-0 h-14 flex items-center justify-between px-6 border-b border-line">
       <div class="flex items-center gap-2.5">
@@ -148,6 +237,8 @@ function nouvelle() {
         <p class="text-center text-[11px] text-muted mt-2">L'assistant peut se tromper. Vérifiez les informations importantes.</p>
       </div>
     </div>
+    </div>
+    <!-- fin colonne principale -->
   </div>
 </template>
 

@@ -4,6 +4,11 @@ spring:
     import: optional:file:.env[.properties]
   application:
     name: backend
+  # taille max des fichiers uploadés dans le formulaire (documents, images, audio)
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 16MB
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/smartesn}
     username: ${DB_USERNAME:postgres}
@@ -26,5 +31,8 @@ app:
     base-url: ${IA_BASE_URL:http://localhost:8000}
   # NB : la configuration Jira n'est PAS ici. En SaaS, chaque entreprise a son propre Jira ;
   # la config est donc stockée par entreprise en base (voir entité Entreprise).
-  # URL publique du formulaire client (front) servant à construire le lien partageable
-  form-base-url: ${FORM_BASE_URL:http://localhost:4200/formulaire}
+  # URL publique de l'app cliente (formulaire) servant à construire le lien partageable
+  form-base-url: ${FORM_BASE_URL:http://localhost:4200}
+  # origines autorisées par le CORS (séparées par des virgules)
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200,http://localhost:5173}

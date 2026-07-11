@@ -1,34 +1,88 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/authStore'
 import AuthField from '../components/AuthField.vue'
-import { validateEmail, validateName, validatePassword } from '../utils/validators'
+import {
+  validateConfirm,
+  validateEmail,
+  validateName,
+  validatePassword,
+  passwordStrength,
+} from '../utils/validators'
 import BaseButton from '@/features/landing/components/ui/BaseButton.vue'
 import Logo from '@/features/landing/components/ui/Logo.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
 
-const form = reactive({ nomEntreprise: '', nomAdmin: '', email: '', motDePasse: '' })
+const form = reactive({
+  nomEntreprise: '',
+  nomAdmin: '',
+  email: '',
+  motDePasse: '',
+  confirmation: '',
+})
 const errors = reactive<Record<keyof typeof form, string | null>>({
   nomEntreprise: null,
   nomAdmin: null,
   email: null,
   motDePasse: null,
+  confirmation: null,
+})
+// champs déjà « touchés » → on ne montre l'erreur qu'après interaction
+const touched = reactive<Record<keyof typeof form, boolean>>({
+  nomEntreprise: false,
+  nomAdmin: false,
+  email: false,
+  motDePasse: false,
+  confirmation: false,
 })
 
-function validate(): boolean {
-  errors.nomEntreprise = validateName(form.nomEntreprise)
-  errors.nomAdmin = validateName(form.nomAdmin)
-  errors.email = validateEmail(form.email)
-  errors.motDePasse = validatePassword(form.motDePasse)
-  return !errors.nomEntreprise && !errors.nomAdmin && !errors.email && !errors.motDePasse
+function check(field: keyof typeof form) {
+  if (field === 'nomEntreprise') errors.nomEntreprise = validateName(form.nomEntreprise)
+  if (field === 'nomAdmin') errors.nomAdmin = validateName(form.nomAdmin)
+  if (field === 'email') errors.email = validateEmail(form.email)
+  if (field === 'motDePasse') {
+    errors.motDePasse = validatePassword(form.motDePasse)
+    if (touched.confirmation) errors.confirmation = validateConfirm(form.motDePasse, form.confirmation)
+  }
+  if (field === 'confirmation') errors.confirmation = validateConfirm(form.motDePasse, form.confirmation)
 }
 
+// validation en direct dès que le champ a été touché
+function onInput(field: keyof typeof form) {
+  if (touched[field]) check(field)
+}
+function onBlur(field: keyof typeof form) {
+  touched[field] = true
+  check(field)
+}
+
+const force = computed(() => passwordStrength(form.motDePasse))
+
+const formValide = computed(
+  () =>
+    !validateName(form.nomEntreprise) &&
+    !validateName(form.nomAdmin) &&
+    !validateEmail(form.email) &&
+    !validatePassword(form.motDePasse) &&
+    !validateConfirm(form.motDePasse, form.confirmation),
+)
+
 async function onSubmit() {
-  if (!validate()) return
-  const ok = await auth.register({ ...form })
+  ;(Object.keys(form) as (keyof typeof form)[]).forEach((f) => {
+    touched[f] = true
+    check(f)
+  })
+  if (!formValide.value) return
+
+  const ok = await auth.register({
+    nomEntreprise: form.nomEntreprise,
+    nomAdmin: form.nomAdmin,
+    email: form.email,
+    motDePasse: form.motDePasse,
+  })
   if (ok) router.push('/dashboard')
 }
 </script>
@@ -52,16 +106,20 @@ async function onSubmit() {
         <AuthField
           v-model="form.nomEntreprise"
           label="Nom de l'entreprise"
-          placeholder="posioner SARL"
+          placeholder="Ex. Posioner SARL"
           autocomplete="organization"
           :error="errors.nomEntreprise"
+          @update:modelValue="onInput('nomEntreprise')"
+          @blur="onBlur('nomEntreprise')"
         />
         <AuthField
           v-model="form.nomAdmin"
           label="Votre nom"
-          placeholder="giorno giovanna"
+          placeholder="Ex. Jean Kamga"
           autocomplete="name"
           :error="errors.nomAdmin"
+          @update:modelValue="onInput('nomAdmin')"
+          @blur="onBlur('nomAdmin')"
         />
         <AuthField
           v-model="form.email"
@@ -70,17 +128,52 @@ async function onSubmit() {
           placeholder="vous@entreprise.com"
           autocomplete="email"
           :error="errors.email"
-        />
-        <AuthField
-          v-model="form.motDePasse"
-          label="Mot de passe"
-          type="password"
-          placeholder="6 caractères minimum"
-          autocomplete="new-password"
-          :error="errors.motDePasse"
+          @update:modelValue="onInput('email')"
+          @blur="onBlur('email')"
         />
 
-        <BaseButton type="submit" variant="dark" class="w-full mt-2" :disabled="auth.loading">
+        <div>
+          <AuthField
+            v-model="form.motDePasse"
+            label="Mot de passe"
+            type="password"
+            placeholder="8 caractères, majuscule, chiffre"
+            autocomplete="new-password"
+            :error="errors.motDePasse"
+            @update:modelValue="onInput('motDePasse')"
+            @blur="onBlur('motDePasse')"
+          />
+          <!-- indicateur de force -->
+          <div v-if="form.motDePasse" class="mt-2 flex items-center gap-2">
+            <div class="flex-1 flex gap-1">
+              <span
+                v-for="i in 4"
+                :key="i"
+                class="h-1.5 flex-1 rounded-full transition-colors"
+                :style="{ backgroundColor: i <= force.score ? force.color : '#e2e8f0' }"
+              />
+            </div>
+            <span class="text-[12px] font-bold" :style="{ color: force.color }">{{ force.label }}</span>
+          </div>
+        </div>
+
+        <AuthField
+          v-model="form.confirmation"
+          label="Confirmer le mot de passe"
+          type="password"
+          placeholder="Retapez le mot de passe"
+          autocomplete="new-password"
+          :error="errors.confirmation"
+          @update:modelValue="onInput('confirmation')"
+          @blur="onBlur('confirmation')"
+        />
+
+        <BaseButton
+          type="submit"
+          variant="dark"
+          class="w-full mt-2"
+          :disabled="auth.loading || !formValide"
+        >
           {{ auth.loading ? 'Création…' : 'Créer mon compte' }}
         </BaseButton>
       </form>

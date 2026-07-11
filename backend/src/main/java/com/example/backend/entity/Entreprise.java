@@ -58,9 +58,15 @@ public class Entreprise {
     public String getJiraProjectKey() { return jiraProjectKey; }
     public void setJiraProjectKey(String jiraProjectKey) { this.jiraProjectKey = jiraProjectKey; }
 
-    public boolean jiraConfigure() {
+    /** Connecté à Jira (URL + jeton) : suffisant pour lister les projets. */
+    public boolean jiraConnecte() {
         return jiraBaseUrl != null && !jiraBaseUrl.isBlank()
-                && jiraApiToken != null && !jiraApiToken.isBlank()
+                && jiraApiToken != null && !jiraApiToken.isBlank();
+    }
+
+    /** Entièrement configuré (connecté + projet choisi) : requis pour créer les tâches. */
+    public boolean jiraConfigure() {
+        return jiraConnecte()
                 && jiraProjectKey != null && !jiraProjectKey.isBlank();
     }
 }

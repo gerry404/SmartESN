@@ -14,3 +14,13 @@ export function saveJiraConfig(body: JiraConfigPayload): Promise<JiraConfigStatu
   })
 }
 
+export interface JiraProjet {
+  key: string
+  name: string
+}
+
+// GET /admin/jira/projets → liste des projets du Jira connecté
+export function getJiraProjets(): Promise<JiraProjet[]> {
+  return http<JiraProjet[]>('/admin/jira/projets')
+}
+

@@ -69,6 +69,40 @@ public class IaClient {
                 .body(DecompositionIa.class);
     }
 
+    /** Appelle POST /chat avec un contexte optionnel (ex. stats de l'entreprise). */
+    public String chat(List<Map<String, String>> messages, String contexte) {
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("messages", messages);
+        if (contexte != null) body.put("contexte", contexte);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> reponse = restClient.post()
+                .uri("/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body)
+                .retrieve()
+                .body(Map.class);
+        return reponse != null ? String.valueOf(reponse.get("reply")) : "";
+    }
+
+    /** Envoie un fichier au service IA pour extraction. Renvoie { type_fichier, texte }. */
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> extract(byte[] contenu, String nomFichier, String contentType) {
+        var body = new org.springframework.util.LinkedMultiValueMap<String, Object>();
+        var resource = new org.springframework.core.io.ByteArrayResource(contenu) {
+            @Override
+            public String getFilename() {
+                return nomFichier;
+            }
+        };
+        body.add("file", resource);
+        return restClient.post()
+                .uri("/extract")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .body(Map.class);
+    }
+
     // corps de requête sérialisé en JSON { "description": "..." }
     public record DescriptionBody(String description) {
     }

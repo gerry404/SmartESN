@@ -39,6 +39,7 @@ const nav = computed<NavItem[]>(() => {
     },
     { label: 'Reporting', icon: 'insights', path: '/reporting' },
     { label: 'Assistant', icon: 'forum', path: '/chat' },
+    { label: 'Partager le formulaire', icon: 'share', path: '/partager' },
   ]
   if (auth.user?.role === 'ADMIN') {
     base.push(

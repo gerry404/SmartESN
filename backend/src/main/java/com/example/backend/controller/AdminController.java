@@ -27,6 +27,7 @@ public class AdminController {
     private final EntrepriseRepository entrepriseRepository;
     private final PasswordEncoder passwordEncoder;
     private final UtilisateurCourantService utilisateurCourant;
+    private final com.example.backend.service.JiraClient jiraClient;
 
     @org.springframework.beans.factory.annotation.Value("${app.form-base-url}")
     private String formBaseUrl;
@@ -35,45 +36,71 @@ public class AdminController {
                            GrilleReferenceRepository grilleRepository,
                            EntrepriseRepository entrepriseRepository,
                            PasswordEncoder passwordEncoder,
-                           UtilisateurCourantService utilisateurCourant) {
+                           UtilisateurCourantService utilisateurCourant,
+                           com.example.backend.service.JiraClient jiraClient) {
         this.utilisateurRepository = utilisateurRepository;
         this.grilleRepository = grilleRepository;
         this.entrepriseRepository = entrepriseRepository;
         this.passwordEncoder = passwordEncoder;
         this.utilisateurCourant = utilisateurCourant;
+        this.jiraClient = jiraClient;
     }
 
     // ---- Lien public du formulaire client (à partager avec les prospects) ----
     @GetMapping("/lien-formulaire")
     public Map<String, String> lienFormulaire() {
         Entreprise e = utilisateurCourant.entreprise();
+        String token = e.getFormToken() == null ? "" : e.getFormToken();
         return Map.of(
-                "token", e.getFormToken() == null ? "" : e.getFormToken(),
-                "lien", formBaseUrl + "/" + (e.getFormToken() == null ? "" : e.getFormToken())
+                "token", token,
+                "lien", formBaseUrl + "?entrepriseKey=" + token
         );
     }
 
     // ---- Configuration de l'intégration Jira (propre à l'entreprise de l'admin) ----
     @PutMapping("/jira")
-    public ResponseEntity<?> configurerJira(@Valid @RequestBody JiraConfigRequest request) {
+    public Map<String, Object> configurerJira(@Valid @RequestBody JiraConfigRequest request) {
         Entreprise entreprise = utilisateurCourant.entreprise();
         entreprise.setJiraBaseUrl(request.baseUrl());
         entreprise.setJiraEmail(request.email());
-        entreprise.setJiraApiToken(request.apiToken());
+        // token conservé s'il n'est pas re-fourni (ex. simple changement de projet)
+        if (request.apiToken() != null && !request.apiToken().isBlank()) {
+            entreprise.setJiraApiToken(request.apiToken());
+        }
         entreprise.setJiraProjectKey(request.projectKey());
         entrepriseRepository.save(entreprise);
-        return ResponseEntity.ok(Map.of("message", "Configuration Jira enregistrée."));
+        return etatJiraMap(entreprise); // renvoie l'état à jour (comme attendu par le front)
     }
 
     @GetMapping("/jira")
-    public ResponseEntity<?> etatJira() {
+    public Map<String, Object> etatJira() {
+        return etatJiraMap(utilisateurCourant.entreprise());
+    }
+
+    // Liste les projets du Jira connecté (le chef peut en avoir plusieurs)
+    @GetMapping("/jira/projets")
+    public ResponseEntity<?> projetsJira() {
         Entreprise e = utilisateurCourant.entreprise();
-        // on ne renvoie jamais le token ; juste l'état de configuration
-        return ResponseEntity.ok(Map.of(
+        if (!e.jiraConnecte()) {
+            return ResponseEntity.status(409)
+                    .body(Map.of("erreur", "Connectez d'abord votre Jira (URL + jeton)."));
+        }
+        try {
+            return ResponseEntity.ok(jiraClient.listerProjets(e));
+        } catch (Exception ex) {
+            return ResponseEntity.status(502)
+                    .body(Map.of("erreur", "Connexion refusée par Jira. Vérifiez l'URL, l'email et le jeton."));
+        }
+    }
+
+    // État de config Jira sans jamais exposer le token
+    private Map<String, Object> etatJiraMap(Entreprise e) {
+        return Map.of(
                 "configure", e.jiraConfigure(),
                 "baseUrl", e.getJiraBaseUrl() == null ? "" : e.getJiraBaseUrl(),
+                "email", e.getJiraEmail() == null ? "" : e.getJiraEmail(),
                 "projectKey", e.getJiraProjectKey() == null ? "" : e.getJiraProjectKey()
-        ));
+        );
     }
 
     // ---- Gestion des utilisateurs internes (cloisonnée par entreprise) ----
@@ -127,10 +154,27 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    // ---- Paramétrage de la grille de référence ----
+    // ---- Paramétrage de la grille de référence (CRUD) ----
     @GetMapping("/grille")
     public List<GrilleReference> listerGrille() {
         return grilleRepository.findAll();
+    }
+
+    @PostMapping("/grille")
+    public ResponseEntity<?> creerGrille(@Valid @RequestBody GrilleCreateRequest request) {
+        // évite les doublons (type + complexité) : une seule ligne par couple
+        if (grilleRepository.findByTypeAndComplexite(request.type(), request.complexite()).isPresent()) {
+            return ResponseEntity.badRequest()
+                    .body("Une référence existe déjà pour ce type et cette complexité.");
+        }
+        GrilleReference g = new GrilleReference();
+        g.setType(request.type());
+        g.setComplexite(request.complexite());
+        g.setBudgetMin(request.budgetMin());
+        g.setBudgetMax(request.budgetMax());
+        g.setDelaiMin(request.delaiMin());
+        g.setDelaiMax(request.delaiMax());
+        return ResponseEntity.ok(grilleRepository.save(g));
     }
 
     @PutMapping("/grille/{id}")
@@ -143,5 +187,12 @@ public class AdminController {
         g.setDelaiMin(request.delaiMin());
         g.setDelaiMax(request.delaiMax());
         return ResponseEntity.ok(grilleRepository.save(g));
+    }
+
+    @DeleteMapping("/grille/{id}")
+    public ResponseEntity<Void> supprimerGrille(@PathVariable Long id) {
+        if (!grilleRepository.existsById(id)) return ResponseEntity.notFound().build();
+        grilleRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

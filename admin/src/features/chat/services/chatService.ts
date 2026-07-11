@@ -5,30 +5,37 @@ export interface ChatMessage {
   content: string
 }
 
-// 👇 Faux modèle le temps que le backend expose un endpoint de chat.
-//    Passe à `false` et adapte l'URL/format quand `/chat` sera disponible.
-const USE_MOCK = true
-
-function fakeDelay<T>(value: T, ms = 700): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms))
+export interface Conversation {
+  id: number
+  titre: string
+  dateMaj: string
 }
 
-/**
- * Envoie l'historique au modèle et renvoie la réponse de l'assistant.
- * Version réelle attendue : POST /chat { messages } → { reply }.
- */
-export async function sendMessage(messages: ChatMessage[]): Promise<string> {
-  if (USE_MOCK) {
-    const last = messages.filter((m) => m.role === 'user').at(-1)?.content ?? ''
-    return fakeDelay(
-      `Bien reçu. Concernant « ${last.slice(0, 80)} » : je peux vous aider à qualifier ` +
-        `le besoin, estimer les charges et préparer un chiffrage cohérent. ` +
-        `(Réponse simulée — le modèle réel sera branché sur l'endpoint /chat.)`,
-    )
-  }
-  const res = await http<{ reply: string }>('/chat', {
-    method: 'POST',
-    body: JSON.stringify({ messages }),
-  })
-  return res.reply
+// Liste les discussions de l'utilisateur (récentes d'abord)
+export function listConversations(): Promise<Conversation[]> {
+  return http<Conversation[]>('/chat/conversations')
+}
+
+// Crée une nouvelle discussion vide
+export function creerConversation(): Promise<Conversation> {
+  return http<Conversation>('/chat/conversations', { method: 'POST' })
+}
+
+// Récupère les messages d'une discussion (mémoire persistée)
+export function getMessages(conversationId: number): Promise<ChatMessage[]> {
+  return http<ChatMessage[]>(`/chat/conversations/${conversationId}/messages`)
+}
+
+// Envoie un message : le backend persiste et appelle le LLM avec tout l'historique
+export async function sendMessage(conversationId: number, content: string): Promise<string> {
+  const res = await http<{ role: string; content: string }>(
+    `/chat/conversations/${conversationId}/messages`,
+    { method: 'POST', body: JSON.stringify({ content }) },
+  )
+  return res.content
+}
+
+// Supprime une discussion
+export function supprimerConversation(id: number): Promise<void> {
+  return http<void>(`/chat/conversations/${id}`, { method: 'DELETE' })
 }

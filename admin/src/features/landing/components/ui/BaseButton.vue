@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
 
 type Variant = 'dark' | 'outline-dark' | 'outline-light' | 'light'
 type Size = 'sm' | 'md'
@@ -8,12 +9,14 @@ const props = withDefaults(
   defineProps<{
     variant?: Variant
     size?: Size
+    to?: string // lien interne (router)
+    href?: string // lien externe / ancre
   }>(),
   { variant: 'dark', size: 'md' },
 )
 
 const base =
-  'font-label rounded-[60px] transition-all duration-300 shrink-0 inline-flex items-center justify-center uppercase tracking-wider font-bold'
+  'font-label rounded-[60px] transition-all duration-300 shrink-0 inline-flex items-center justify-center uppercase tracking-wider font-bold cursor-pointer'
 
 const variants: Record<Variant, string> = {
   dark: 'bg-black text-white hover:bg-text/80',
@@ -28,10 +31,13 @@ const sizes: Record<Size, string> = {
 }
 
 const classes = computed(() => [base, variants[props.variant], sizes[props.size]])
+
+// choisit l'élément rendu : RouterLink (to), <a> (href) ou <button>
+const tag = computed(() => (props.to ? RouterLink : props.href ? 'a' : 'button'))
 </script>
 
 <template>
-  <button :class="classes">
+  <component :is="tag" :to="to" :href="href" :class="classes">
     <slot />
-  </button>
+  </component>
 </template>

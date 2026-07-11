@@ -56,8 +56,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       {{ hero.subtitle }}
     </p>
     <div class="flex flex-col sm:flex-row gap-4 mb-lg">
-      <BaseButton variant="dark">{{ hero.primaryCta }}</BaseButton>
-      <BaseButton variant="outline-dark">{{ hero.secondaryCta }}</BaseButton>
+      <BaseButton variant="dark" to="/register">{{ hero.primaryCta }}</BaseButton>
+      <BaseButton variant="outline-dark" href="#formulaire">{{ hero.secondaryCta }}</BaseButton>
     </div>
 
     <!-- 3D reveal wrapper: perspective gives the vanishing point -->

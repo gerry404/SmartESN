@@ -30,8 +30,8 @@ defineProps<{ cta: CtaContent }>()
           {{ cta.title }}
         </h2>
         <div class="flex flex-col sm:flex-row gap-5 pointer-events-auto">
-          <BaseButton variant="light">{{ cta.primaryCta }}</BaseButton>
-          <BaseButton variant="outline-light">{{ cta.secondaryCta }}</BaseButton>
+          <BaseButton variant="light" to="/register">{{ cta.primaryCta }}</BaseButton>
+          <BaseButton variant="outline-light" href="#formulaire">{{ cta.secondaryCta }}</BaseButton>
         </div>
         <p class="mt-8 font-label text-[11px] uppercase tracking-[0.2em] text-white/40">
           Glissez pour explorer

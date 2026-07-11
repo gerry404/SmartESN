@@ -29,7 +29,8 @@ export const useAuthStore = defineStore('auth',() => {
         user.value = { email: res.email, role: res.role }
         return true
     }catch (e) {
-      error.value = e instanceof Error ? e.message : 'Connexion impossible.'
+      // message précis du backend (ex. « Identifiants incorrects ») sinon fallback
+      error.value = e instanceof Error && e.message ? e.message : 'Connexion impossible.'
       return false
     } finally {
       loading.value = false
@@ -46,7 +47,7 @@ export const useAuthStore = defineStore('auth',() => {
       user.value = { email: res.email, role: res.role }
       return true
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Inscription impossible.'
+      error.value = e instanceof Error && e.message ? e.message : 'Inscription impossible.'
       return false
     } finally {
       loading.value = false

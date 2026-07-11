@@ -29,10 +29,21 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
         location.assign('/login?redirect=' + encodeURIComponent(location.pathname))
       }
     }
-    const message =
-      data && typeof data === 'object' && 'message' in data
-        ? String((data as { message: unknown }).message)
-        : `Erreur ${res.status}`
+    // Le backend peut renvoyer : du texte brut, { message }, { erreur }
+    // ou un objet de validation { champ: message }. On construit un message lisible.
+    let message = `Erreur ${res.status}`
+    if (typeof data === 'string' && data.trim()) {
+      message = data.trim()
+    } else if (data && typeof data === 'object') {
+      const obj = data as Record<string, unknown>
+      if (typeof obj.message === 'string') message = obj.message
+      else if (typeof obj.erreur === 'string') message = obj.erreur
+      else {
+        // objet de validation → concatène les messages des champs
+        const vals = Object.values(obj).filter((v) => typeof v === 'string') as string[]
+        if (vals.length) message = vals.join(' ')
+      }
+    }
     const err = new Error(message) as HttpError
     err.status = res.status
     err.data = data

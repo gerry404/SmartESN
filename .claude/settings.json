@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"c:/Users/GERRYJUNIORFONKOUA/Desktop/projet/SmartESN\" && find . -iname \"human-brain.zip\" 2>/dev/null; echo \"---DOWNLOADS---\"; ls -la \"/c/Users/GERRYJUNIORFONKOUA/Downloads\" 2>/dev/null | grep -i brain; echo \"---DESKTOP---\"; ls -la \"/c/Users/GERRYJUNIORFONKOUA/Desktop\" 2>/dev/null | grep -i brain)",
+      "Read(//c/Users/GERRYJUNIORFONKOUA/Downloads/**)",
+      "Read(//c/Users/GERRYJUNIORFONKOUA/Desktop/**)",
+      "Bash(mkdir -p /tmp/brainextract)",
+      "Bash(unzip -o -q human-brain.zip -d /tmp/brainextract)",
+      "Bash(cd \"c:/Users/GERRYJUNIORFONKOUA/Desktop/projet/SmartESN/admin\" && mkdir -p src/assets/models && cp \"/tmp/brainextract/source/Rotten Brain.glb\" src/assets/models/human-brain.glb && ls -la src/assets/models/ && echo \"---vite config---\" && cat vite.config.* 2>/dev/null | head -40)",
+      "Bash(node -e \"console.log\\('three', require\\('three/package.json'\\).version\\)\")",
+      "Bash(npm install *)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@angular/core/package.json'\\).version\\)\")",
+      "Bash(npm view *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(xargs -n1 basename)",
+      "Bash(grep -E \"\\\\.js$|\\\\.css$\")",
+      "WebFetch(domain:unsplash.com)"
+    ],
+    "additionalDirectories": [
+      "\\tmp\\brainextract\\source"
+    ]
+  }
+}
